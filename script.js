@@ -189,7 +189,6 @@ const page = {
 			container.appendChild(canvas);
 			
 			dataProvider.get((data) => {
-				console.log(data)
 				new Chart(canvas, {
 					type: "line",
 					data: data,
