@@ -1,4 +1,5 @@
 const page = {
+	programs: [],
 	items: [],
 	cards: [
 		{
@@ -41,7 +42,34 @@ const page = {
 		toggle.style.color = o.scrollTop > toggle.offsetHeight / 2 ? "black" : "white";
 	},
 	
-	fillDrawer: () => {
+	fillPrograms: () => {
+		// Get programs list
+		const programs = document.getElementById("programs");
+		
+		// Remove variables from programs list
+		while (programs.options.length)
+		{
+			programs.remove(0);
+		}
+		
+		// Repopulate programs
+		if (page.programs.length)
+		{
+			page.programs.forEach((e, index) => {
+				const opt = new Option(e.program + " - " + e.position, index);
+				opt.setAttribute("data-program", e.program);
+				opt.setAttribute("data-position", e.position);
+				programs.options.add(opt);
+			});
+		}
+		else
+		{
+			programs.options.add(new Option("---", -1));
+		}
+	},
+	
+	fillVariables: () => {		
+		// Get side menu
 		const parent = document.querySelector(".side-menu");
 		
 		// Remove variables from side menu
@@ -50,7 +78,7 @@ const page = {
 			parent.removeChild(parent.firstChild);
 		}
 		
-		// Repopulate side menu
+		// Repopulate variables
 		page.items.forEach((e, index) => {
 			// Create anchor
 			const div = document.createElement("DIV");
@@ -140,8 +168,11 @@ const page = {
 				{
 					if (xhr.status == 200)
 					{
-						page.items = JSON.parse(xhr.responseText).data;
-						page.fillDrawer();
+						const response = JSON.parse(xhr.responseText);
+						page.programs = response.programs;
+						page.items = response.data;
+						page.fillPrograms();
+						page.fillVariables();
 					}
 					else
 					{
@@ -160,7 +191,7 @@ const page = {
 		// Check if data is available
 		if (!dataProvider.isValid())
 		{
-			dialog.show("Avviso", "Devi selezionare almeno una variabile!", dialog.acceptAction);
+			dialog.show("Avviso", "Devi selezionare almeno un programma / posizione e una variabile!", dialog.acceptAction);
 			return;
 		}
 		
@@ -284,7 +315,7 @@ const dataProvider = {
 	variables: {},
 	
 	build: () => {
-		dataProvider.variables = {};
+		dataProvider.variables = {};		
 		document.querySelectorAll(".side-menu .mdl-checkbox.is-checked").forEach((e) => {
 			const key = e.getAttribute("for");
 			const label = e.querySelector(".mdl-checkbox__label").innerHTML;
@@ -294,7 +325,7 @@ const dataProvider = {
 	},
 	
 	isValid: () => {
-		return Object.keys(dataProvider.variables).length;
+		return document.getElementById("programs").value != "-1" && Object.keys(dataProvider.variables).length;
 	},
 	
 	get: (callback) => {		
@@ -303,8 +334,12 @@ const dataProvider = {
 			dataProvider.xhr.abort();
 		}
 		
+		const program = document.getElementById("programs");
+		
 		const formData = new FormData();
 		formData.append("s", "values");
+		formData.append("program", program.options[program.selectedIndex].getAttribute("data-program"));
+		formData.append("position", program.options[program.selectedIndex].getAttribute("data-position"));
 		formData.append("vars", Object.keys(dataProvider.variables).join(","));
 		
 		dataProvider.xhr = new XMLHttpRequest();

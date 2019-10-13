@@ -15,6 +15,10 @@ body {
 .page-content {
 	flex: 1
 }
+.side-nav > .smaller {
+	padding-left: 16px;
+	padding-right: 16px
+}
 .side-menu > div {
 	display: flex !important;
 	flex-direction: row;

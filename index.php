@@ -15,7 +15,17 @@
 		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
 			<div class="mdl-layout__drawer">
 				<span class="mdl-layout-title">Pannello</span>
-				<nav class="mdl-navigation side-menu"></nav>
+				<nav class="mdl-navigation side-nav">
+					<div class="smaller">
+						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-focused">
+							<select class="mdl-textfield__input" type="text" id="programs">
+								<option value="-1">---</option>
+							</select>
+							<label class="mdl-textfield__label" for="programs">Program &amp; Position</label>
+						</div>
+					</div>
+					<div class="side-menu"></div>
+				</nav>
 			</div>
 			<main class="mdl-layout__content" onscroll="page.scroll(this)">
 				<div class="page-content">
