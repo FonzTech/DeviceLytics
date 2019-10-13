@@ -14,7 +14,18 @@ if (isset($_REQUEST["s"]))
 			$sql = $dbc->prepare("SELECT column_name, column_label FROM opvar");
 			if ($sql->execute())
 			{
-				$response["vars"] = $sql->fetchAll(PDO::FETCH_ASSOC);
+				$response["data"] = $sql->fetchAll(PDO::FETCH_ASSOC);
+				$response["success"] = true;
+			}
+		
+			break;
+			
+		case "values":
+		
+			$sql = $dbc->prepare("SELECT id, " . preg_replace("/(?!(\w|\d|\,))/i", "", $_REQUEST["vars"]) . " FROM oplog ORDER BY id ASC");
+			if ($sql->execute())
+			{
+				$response["data"] = $sql->fetchAll(PDO::FETCH_ASSOC);
 				$response["success"] = true;
 			}
 		

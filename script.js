@@ -140,7 +140,7 @@ const page = {
 				{
 					if (xhr.status == 200)
 					{
-						page.items = JSON.parse(xhr.responseText).vars;
+						page.items = JSON.parse(xhr.responseText).data;
 						page.fillDrawer();
 					}
 					else
@@ -188,21 +188,29 @@ const page = {
 			canvas.style.height = "100%";
 			container.appendChild(canvas);
 			
-			new Chart(canvas, {
-				type: 'line',
-				data: dataProvider.get(),
-				options: {
-					responsive: true,
-					maintainAspectRatio: false,
-					scales: {
-						yAxes: [{
-							ticks: {
-								beginAtZero: true
+			dataProvider.get((data) => {
+				console.log(data)
+				new Chart(canvas, {
+					type: "line",
+					data: data,
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						scales: {
+							yAxes: [{
+								ticks: {
+									beginAtZero: true
+								}
+							}]
+						},
+						elements: {
+							point: {
+								radius: 0
 							}
-						}]
+						}
 					}
-				}
-			});
+				});
+			})
 		}
 	}
 };
@@ -265,6 +273,7 @@ const components = {
 };
 
 const dataProvider = {
+	xhr: null,
 	colors: [
 		"255, 99, 132",
         "54, 162, 235",
@@ -279,8 +288,9 @@ const dataProvider = {
 		dataProvider.variables = {};
 		document.querySelectorAll(".side-menu .mdl-checkbox.is-checked").forEach((e) => {
 			const key = e.getAttribute("for");
-			const name = e.querySelector(".mdl-checkbox__label").innerHTML;
-			dataProvider.variables[key] = name;
+			const label = e.querySelector(".mdl-checkbox__label").innerHTML;
+			const name = e.querySelector("input[type=checkbox]").getAttribute("data-column-name");
+			dataProvider.variables[name] = label;
 		});
 	},
 	
@@ -288,42 +298,74 @@ const dataProvider = {
 		return Object.keys(dataProvider.variables).length;
 	},
 	
-	get: () => {
-		const data = {
-			labels: [],
-			datasets: [],
-		};
-		
-		// Dummy labels
-		for (let i = 0; i < 20; ++i)
+	get: (callback) => {		
+		if (dataProvider.xhr !== null)
 		{
-			data.labels.push(i);
+			dataProvider.xhr.abort();
 		}
 		
-		Object.keys(dataProvider.variables).forEach((k, i) => {
-			// Get correct color
-			const color = dataProvider.colors[i % dataProvider.colors.length];
-			
-			// Create dataset
-			const dataset = {
-				label: dataProvider.variables[k],
-				data: [],
-				backgroundColor: "rgba(" + color + ", 0.25)",
-				borderColor: "rgba(" + color + ", 1)",
-				borderWidth: 1,
-				fill: false
-			};
-			
-			// Dummy data for dataset
-			for (let j = 0; j < data.labels.length; ++j)
-			{
-				dataset.data.push(Math.round(Math.random() * 100));
-			}
-			
-			// Push dataset
-			data.datasets.push(dataset);
-		});
+		const formData = new FormData();
+		formData.append("s", "values");
+		formData.append("vars", Object.keys(dataProvider.variables).join(","));
 		
-		return data;
+		dataProvider.xhr = new XMLHttpRequest();
+		dataProvider.xhr.open("POST", "api.php", true);
+		dataProvider.xhr.onreadystatechange = () => {
+			if (dataProvider.xhr.readyState === XMLHttpRequest.DONE)
+			{
+				if (dataProvider.xhr.status == 200)
+				{
+					// Parse response
+					const response = JSON.parse(dataProvider.xhr.responseText);
+					
+					// Labels and datasets
+					const labels = [];
+					const datasets = [];
+					
+					// Iterate through every log
+					Object.keys(dataProvider.variables).forEach((k, i) => {
+						// Get correct color
+						const color = dataProvider.colors[i % dataProvider.colors.length];
+						
+						// Create dataset
+						const dataset = {
+							label: dataProvider.variables[k],
+							data: [],
+							backgroundColor: "rgba(" + color + ", 0.25)",
+							borderColor: "rgba(" + color + ", 1)",
+							borderWidth: 1,
+							fill: false
+						};
+						
+						// Fill data
+						response.data.forEach((e) => {
+							// Fill labels
+							if (!i)
+							{
+								labels.push(e.id);
+							}
+							
+							// Dummy data for dataset
+							dataset.data.push(parseFloat(e[k]));
+						});
+							
+						// Push dataset
+						datasets.push(dataset);
+					});
+					
+					callback({
+						labels: labels,
+						datasets: datasets
+					});
+				}
+				else
+				{
+					alert("Errore durante l'ottenimento dei dati per il grafico.");
+				}
+				
+				dataProvider.xhr = null;
+			}
+		};
+		dataProvider.xhr.send(formData);
 	}
 };
