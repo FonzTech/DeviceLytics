@@ -9,6 +9,7 @@
 		<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-light_blue.min.css">
 		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
 		<link rel="stylesheet" href="style.css">
+		<link rel="shortcut icon" type="image/png" href="favicon.png"/>
 	</head>
 	<body onload="page.fillDrawer(); page.load(0)">
 		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
