@@ -11,7 +11,7 @@
 		<link rel="stylesheet" href="style.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.png"/>
 	</head>
-	<body onload="page.fillDrawer(); page.load(0)">
+	<body onload="page.load(-1)">
 		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
 			<div class="mdl-layout__drawer">
 				<span class="mdl-layout-title">Pannello</span>

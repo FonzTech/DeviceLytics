@@ -1,22 +1,5 @@
 const page = {
-	items: [
-		{
-			name: "Temperatura",
-			icon: "fas fa-thermometer-empty"
-		},
-		{
-			name: "Pressione",
-			icon: "fas fa-tachometer-alt"
-		},
-		{
-			name: "Potenza",
-			icon: "fas fa-bolt"
-		},
-		{
-			name: "Umidità",
-			icon: "fas fa-water"
-		}
-	],
+	items: [],
 	cards: [
 		{
 			bg: "bg-forecast.jpg",
@@ -60,6 +43,14 @@ const page = {
 	
 	fillDrawer: () => {
 		const parent = document.querySelector(".side-menu");
+		
+		// Remove variables from side menu
+		while (parent.firstChild !== null)
+		{
+			parent.removeChild(parent.firstChild);
+		}
+		
+		// Repopulate side menu
 		page.items.forEach((e, index) => {
 			// Create anchor
 			const div = document.createElement("DIV");
@@ -80,11 +71,12 @@ const page = {
 				input.setAttribute("class", "mdl-checkbox__input");
 				input.setAttribute("type", "checkbox");
 				input.setAttribute("id", id);
+				input.setAttribute("data-column-name", e.column_name);
 				label.appendChild(input);
 				
 				const span = document.createElement("SPAN");
 				span.setAttribute("class", "mdl-checkbox__label");
-				span.innerHTML = e.name;
+				span.innerHTML = e.column_label;
 				label.appendChild(span);
 
 			}
@@ -133,6 +125,31 @@ const page = {
 		// Separator
 		{
 			parent.appendChild(document.createElement("HR"));
+		}
+		
+		// Check if variables should be loaded
+		if (index == -1)
+		{
+			const formData = new FormData();
+			formData.append("s", "vars");
+			
+			const xhr = new XMLHttpRequest();
+			xhr.open("POST", "api.php", true);
+			xhr.onreadystatechange = () => {
+				if (xhr.readyState === XMLHttpRequest.DONE)
+				{
+					if (xhr.status == 200)
+					{
+						page.items = JSON.parse(xhr.responseText).vars;
+						page.fillDrawer();
+					}
+					else
+					{
+						alert("Errore durante la ricezione delle variabili: ricevuto Codice HTTP " + xhr.status);
+					}
+				}
+			};
+			xhr.send(formData);
 		}
 	},
 	
