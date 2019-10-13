@@ -22,11 +22,6 @@ body {
 	align-items: center;
 	padding-left: 24px !important
 }
-.side-menu > div > i {
-	width: 40px;
-	text-align: center;
-	font-size: 1.25em
-}
 .side-menu > div > label {
 	width: auto
 }

@@ -67,13 +67,6 @@ const page = {
 			div.setAttribute("href", "javascript:void(0)"); // Avoid following hyperlink
 			parent.appendChild(div);
 			
-			// Create icon on left side
-			{
-				const i = document.createElement("I");
-				i.setAttribute("class", e.icon);
-				div.appendChild(i);
-			}
-			
 			// Selectable checkbox with label
 			{
 				const id = "cb" + Math.round(Math.random() * 100000);
