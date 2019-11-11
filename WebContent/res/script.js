@@ -1,5 +1,5 @@
 const page = {
-	programs: [],
+	categories: [],
 	items: [],
 	cards: [
 		{
@@ -53,9 +53,9 @@ const page = {
 		}
 		
 		// Repopulate programs
-		if (page.programs.length)
+		if (page.categories.length)
 		{
-			page.programs.forEach((e, index) => {
+			page.categories.forEach((e, index) => {
 				const opt = new Option(e.program + " - " + e.position, index);
 				opt.setAttribute("data-program", e.program);
 				opt.setAttribute("data-position", e.position);
@@ -99,12 +99,12 @@ const page = {
 				input.setAttribute("class", "mdl-checkbox__input");
 				input.setAttribute("type", "checkbox");
 				input.setAttribute("id", id);
-				input.setAttribute("data-column-name", e.column_name);
+				input.setAttribute("data-column-name", e.columnName);
 				label.appendChild(input);
 				
 				const span = document.createElement("SPAN");
 				span.setAttribute("class", "mdl-checkbox__label");
-				span.innerHTML = e.column_label;
+				span.innerHTML = e.columnLabel;
 				label.appendChild(span);
 
 			}
@@ -162,15 +162,15 @@ const page = {
 			formData.append("s", "vars");
 			
 			const xhr = new XMLHttpRequest();
-			xhr.open("POST", "api.php", true);
+			xhr.open("POST", "Api", true);
 			xhr.onreadystatechange = () => {
 				if (xhr.readyState === XMLHttpRequest.DONE)
 				{
 					if (xhr.status == 200)
 					{
 						const response = JSON.parse(xhr.responseText);
-						page.programs = response.programs;
-						page.items = response.data;
+						page.categories = response.categories;
+						page.items = response.variables;
 						page.fillPrograms();
 						page.fillVariables();
 					}
@@ -343,7 +343,7 @@ const dataProvider = {
 		formData.append("vars", Object.keys(dataProvider.variables).join(","));
 		
 		dataProvider.xhr = new XMLHttpRequest();
-		dataProvider.xhr.open("POST", "api.php", true);
+		dataProvider.xhr.open("POST", "Api", true);
 		dataProvider.xhr.onreadystatechange = () => {
 			if (dataProvider.xhr.readyState === XMLHttpRequest.DONE)
 			{
@@ -372,7 +372,7 @@ const dataProvider = {
 						};
 						
 						// Fill data
-						response.data.forEach((e) => {
+						response.forEach((e) => {
 							// Fill labels
 							if (!i)
 							{

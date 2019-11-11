@@ -8,7 +8,7 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css">
 		<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-light_blue.min.css">
 		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
-		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="res/style.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.png"/>
 	</head>
 	<body onload="page.load(-1)">
@@ -41,7 +41,7 @@
 				</div>
 				<footer class="mdl-mini-footer">
 					<div class="mdl-mini-footer__left-section">
-						<div class="mdl-logo">Ti è piaciuta questa applicazione?</div>
+						<div class="mdl-logo">Ti &egrave; piaciuta questa applicazione?</div>
 						<ul class="mdl-mini-footer__link-list">
 							<li><a href="#">Aiuto</a></li>
 						</ul>
@@ -64,6 +64,6 @@
 		</dialog>
 		<script async defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 		<script async defer src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
-		<script async defer src="script.js"></script>
+		<script async defer src="res/script.js"></script>
 	</body>
 </html>
