@@ -72,6 +72,13 @@ body {
 	width: 100%;
 	color: white
 }
+.dialog-wide {
+	width: auto !important;
+	max-width: 640px
+}
+.dialog-wide .mdl-dialog__content {
+	padding-top: 0px !important
+}
 
 @media screen and (max-width: 1023px) {
 	.chart-card {

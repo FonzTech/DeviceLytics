@@ -1,11 +1,24 @@
+const utility = {
+	cleanMdlElement: (element) => {
+		if (element !== null && element.nodeType == Node.ELEMENT_NODE)
+		{
+			element.removeAttribute("data-upgraded");
+			element.querySelectorAll("*[data-upgraded]").forEach((e) => {
+				e.removeAttribute("data-upgraded");
+			});
+		}
+		return element;
+	}
+};
+
 const page = {
 	categories: [],
 	items: [],
 	cards: [
 		{
 			bg: "bg-forecast.jpg",
-			title: "Previsioni",
-			description: "Applica le tecniche di previsione dei guasti."
+			title: "Predizioni",
+			description: "Applica le tecniche di predizione dei guasti."
 		},
 		{
 			bg: "bg-time.jpg",
@@ -138,7 +151,7 @@ const page = {
 				const card = components.getCard(page.cards[i].title, page.cards[i].description);
 				card.classList.add("chart-card");
 				card.onclick = () => {
-					page.clickCard(card);
+					page.clickCard(i);
 				};
 				container.appendChild(card);
 				
@@ -184,14 +197,50 @@ const page = {
 		}
 	},
 	
-	clickCard: (o) => {
+	clickCard: (actionId) => {
+		switch (actionId)
+		{
+		case 0:
+			actions.predict();
+			break;
+
+		case 1:
+			actions.history();
+			break;
+
+		case 2:
+			actions.lastEpoch();
+			break;
+		}
+	}
+};
+
+const actions = {
+	DIALOG_WIDE_CLASS: "dialog-wide",
+		
+	predict: () => {
+		// Get form to be displayed
+		const form = document.getElementById("predict_form").cloneNode(true);
+		
+		// Make dialog wider
+		dialog.get().classList.add(actions.DIALOG_WIDE_CLASS);
+		
+		// Display form in dialog
+		dialog.show("Predizioni", form, dialog.closeAction);
+	},
+		
+	history: () => {
+		// Make dialog normal
+		dialog.get().classList.remove(actions.DIALOG_WIDE_CLASS);
+		
 		// Build data for chart
 		dataProvider.build();
 		
 		// Check if data is available
 		if (!dataProvider.isValid())
 		{
-			dialog.show("Avviso", "Devi selezionare almeno un programma / posizione e una variabile!", dialog.acceptAction);
+			const text = document.createTextNode("Devi selezionare almeno un programma / posizione e una variabile!");
+			dialog.show("Avviso", text, dialog.closeAction);
 			return;
 		}
 		
@@ -242,13 +291,17 @@ const page = {
 				});
 			})
 		}
+	},
+	
+	lastEpoch: () => {
+		alert("Non ancora implementato.");
 	}
 };
 
 const dialog = {
 	element: null,
-	acceptAction: {
-		"OK": () => {
+	closeAction: {
+		"Chiudi": () => {
 			dialog.hide();
 		}
 	},
@@ -261,12 +314,24 @@ const dialog = {
 		return dialog.element;
 	},
 	
-	show: (title, content, actions) => {
+	show: (title, contentDom, actions) => {
 		const d = dialog.get();
 		
+		// Set title
 		d.querySelector(".mdl-dialog__title").innerHTML = title;
-		d.querySelector(".mdl-dialog__content").innerHTML = content;
 		
+		// Set content
+		{
+			const content = d.querySelector(".mdl-dialog__content");
+			while (content.firstChild !== null)
+			{
+				content.removeChild(content.firstChild);
+			}
+			content.appendChild(utility.cleanMdlElement(contentDom));
+			componentHandler.upgradeDom();
+		}
+		
+		// Setup actions
 		const buttons = d.querySelector(".mdl-dialog__actions");
 		
 		while (buttons.firstChild !== null)

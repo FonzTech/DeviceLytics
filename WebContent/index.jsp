@@ -62,6 +62,30 @@
 			<div class="mdl-dialog__content">Content</div>
 			<div class="mdl-dialog__actions"></div>
 		</dialog>
+		<div style="display: none">
+			<form id="predict_form">
+				<h5>Addrestra Modello</h5>
+				<div>
+					Qui puoi caricare il tuo file in formato CSV, in modo tale da addestrare il
+					modello che consente di effettuare le predizioni sui dati attuali e futuri.
+				</div>
+				<div style="margin-top: 16px">
+					<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
+				</div>
+				<input type="file" style="display: none">
+				<hr style="margin-top: 32px">
+				<h5>Predici Risultato</h5>
+				<div>
+					Qui puoi caricare il tuo file in formato CSV, senza la variabile target,
+					modo tale che il modello di predizione lo dia in output. È possibile
+					utilizzare questa funzione anche per testare il modello.
+				</div>
+				<div style="margin-top: 16px">
+					<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
+				</div>
+				<input type="file" style="display: none">
+			</form>
+		</div>
 		<script async defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 		<script async defer src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
 		<script async defer src="res/script.js"></script>
