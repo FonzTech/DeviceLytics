@@ -72,6 +72,27 @@ body {
 	width: 100%;
 	color: white
 }
+.chart-container {
+	position: relative;
+	margin: 32px 0;
+	padding-top: 32px
+}
+.chart-container + .chart-container:after {
+	background-color: #c0c0c0;
+	position: absolute;
+	left: 32px;
+	top: 0;
+	width: calc(100% - 64px);
+	height: 1px;
+	content: ""
+}
+.chart-close {
+	position: absolute;
+	right: 32px;
+	top: 32px;
+	font-size: 16px;
+	text-decoration: none
+}
 .dialog-wide {
 	width: auto !important;
 	max-width: 640px

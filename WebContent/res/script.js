@@ -248,6 +248,7 @@ const actions = {
 		{
 			const parent = page.getFrameContent();
 			
+			/*
 			{
 				const cc = parent.querySelector(".chart-container");
 				if (cc !== null)
@@ -255,9 +256,13 @@ const actions = {
 					cc.parentNode.removeChild(cc);
 				}
 			}
+			*/
+			
+			const id = "chart_" + Math.round(Math.random() * 100000);
 		
 			const container = document.createElement("DIV");
 			container.setAttribute("class", "side chart-container");
+			container.setAttribute("id", id);
 			container.style.overflowX = "auto";
 			container.style.height = "384px";
 			parent.appendChild(container);
@@ -267,6 +272,15 @@ const actions = {
 			canvas.setAttribute("height", "384");
 			canvas.style.height = "100%";
 			container.appendChild(canvas);
+			
+			const close = document.createElement("A");
+			close.setAttribute("class", "chart-close");
+			close.setAttribute("href", "javascript:void(0)");
+			close.onclick = () => {
+				parent.removeChild(container);
+			};
+			close.innerHTML = '<i class="material-icons" style="vertical-align: bottom">close</i> Chiudi Questo Grafico';
+			container.appendChild(close);
 			
 			dataProvider.get((data) => {
 				new Chart(canvas, {
@@ -289,7 +303,9 @@ const actions = {
 						}
 					}
 				});
-			})
+			});
+			
+			componentHandler.upgradeDom();
 		}
 	},
 	
