@@ -4,10 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import devicelytics.model.OpCategory;
 import devicelytics.model.OpVar;
+import lombok.AllArgsConstructor;
 
 public final class OpVarsGetter extends DatabaseTask
 {
@@ -73,9 +73,14 @@ public final class OpVarsGetter extends DatabaseTask
 	@Override
 	public Object getResult()
 	{
-		final HashMap<String, Object> result = new HashMap<>();
-		result.put("categories", categories);
-		result.put("variables", variables);
-		return result;
+		return new Result(categories, variables);
+	}
+	
+	// Getter result
+	@AllArgsConstructor
+	public static final class Result
+	{
+		protected final ArrayList<OpCategory> categories;
+		protected final ArrayList<OpVar> variables;
 	}
 }
