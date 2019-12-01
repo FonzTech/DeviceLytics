@@ -1,3 +1,6 @@
+# DeviceLytics
+Have you ever wondered how much any data is actually valuable? This project aims to provide a useful tool for data analysis, with a simple and intuitive user interface.
+
 ## Why was this project born?
 This project was born from a real need. Then I realized that would be a nice idea to pick it up as a thesis for my Bachelor Degree.
 
