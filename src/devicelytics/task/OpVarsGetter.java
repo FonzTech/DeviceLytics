@@ -5,9 +5,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import lombok.AllArgsConstructor;
+
 import devicelytics.model.OpCategory;
 import devicelytics.model.OpVar;
-import lombok.AllArgsConstructor;
 
 public final class OpVarsGetter extends DatabaseTask
 {
