@@ -62,7 +62,7 @@ public final class OpValuesGetter extends DatabaseTask
 	}
 
 	@Override
-	public Object getResult()
+	public final Object getResult()
 	{
 		return values;
 	}
