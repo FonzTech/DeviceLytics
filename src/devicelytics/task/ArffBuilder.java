@@ -2,7 +2,10 @@ package devicelytics.task;
 
 import java.io.File;
 
-import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
@@ -34,7 +37,7 @@ public final class ArffBuilder extends Task
 		try
 		{
 			// Create temporary file for destination ARFF
-			output = File.createTempFile("dl-", ".arff");
+			output = File.createTempFile("arff-", ".arff");
 			output.deleteOnExit();
 
 			// Call Weka to convert CSV to ARFF
@@ -64,18 +67,21 @@ public final class ArffBuilder extends Task
 	}
 
 	@Override
-	protected void onFinish()
+	protected final void onFinish()
 	{
 	}
 
 	@Override
-	public Object getResult()
+	public final Object getResult()
 	{
 		return new Result(result, output);
 	}
 	
 	// Export result
-	@AllArgsConstructor
+	@RequiredArgsConstructor
+	@Getter
+	@ToString
+	@EqualsAndHashCode
 	public static final class Result
 	{
 		protected final boolean result;
