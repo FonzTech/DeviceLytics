@@ -93,3 +93,6 @@ local.properties
 
 # Testing environment specific
 derby.log
+
+# Application domain
+devicelytics.model
