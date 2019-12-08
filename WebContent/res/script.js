@@ -341,7 +341,6 @@ const dialog = {
 	},
 	sendAndCloseAction: {
 		"Invia": () => {
-			console.log("ok");
 			const formData = new FormData(dialog.get().querySelector("form"));
 			
 			dialog.xhr = new XMLHttpRequest();
@@ -354,7 +353,11 @@ const dialog = {
 						// Parse response
 						const response = JSON.parse(dialog.xhr.responseText);
 						
-						console.log(response);
+						// Show error if required
+						if ("error" in response && response.error !== null)
+						{
+							alert("Errore riscontrato: " + response.error);
+						}
 					}
 					else if (dialog.xhr.status != 0)
 					{
