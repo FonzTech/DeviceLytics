@@ -5,8 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import lombok.AllArgsConstructor;
-
+import lombok.RequiredArgsConstructor;
 import devicelytics.model.OpCategory;
 import devicelytics.model.OpVar;
 
@@ -54,7 +53,7 @@ public final class OpVarsGetter extends DatabaseTask
 		try
 		{
 			final Statement stmt = connection.createStatement();
-			final ResultSet rs = stmt.executeQuery("SELECT id, column_name, column_label FROM opvar");
+			final ResultSet rs = stmt.executeQuery("SELECT id, column_name, column_label FROM opvar WHERE show_for_chart = 1");
 			while (rs.next())
 			{
 				final OpVar var = new OpVar();
@@ -78,7 +77,7 @@ public final class OpVarsGetter extends DatabaseTask
 	}
 	
 	// Getter result
-	@AllArgsConstructor
+	@RequiredArgsConstructor
 	public static final class Result
 	{
 		protected final ArrayList<OpCategory> categories;
