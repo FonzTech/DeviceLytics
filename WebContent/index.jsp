@@ -62,17 +62,7 @@
 			<div class="mdl-dialog__actions"></div>
 		</dialog>
 		<div style="display: none">
-			<form id="predict_form">
-				<h5>Addrestra Modello</h5>
-				<div>
-					Qui puoi caricare il tuo file in formato CSV, in modo tale da addestrare il
-					modello che consente di effettuare le predizioni sui dati attuali e futuri.
-				</div>
-				<div style="margin-top: 16px">
-					<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
-				</div>
-				<input type="file" style="display: none">
-				<hr style="margin-top: 32px">
+			<form id="predict_form" action="Api" method="post">
 				<h5>Predici Risultato</h5>
 				<div>
 					Qui puoi caricare il tuo file in formato CSV, senza la variabile target,
@@ -80,10 +70,35 @@
 					utilizzare questa funzione anche per testare il modello.
 				</div>
 				<div style="margin-top: 16px">
-					<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
+					<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
+					<span>
+						<b>Hai selezionato: </b>
+						<span class="file_name">---</span>
+					</span>
 				</div>
-				<input type="file" style="display: none">
+				<input type="hidden" name="s" value="predict">
+				<input type="file" name="predict_file" style="display: none">
 			</form>
+			<form id="train_form" action="Api" method="post">
+				<h5>Addrestra Modello</h5>
+				<div>
+					Qui puoi caricare il tuo file in formato CSV, in modo tale da addestrare il
+					modello che consente di effettuare le predizioni sui dati attuali e futuri.
+				</div>
+				<div style="margin-top: 16px">
+					<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
+					<span>
+						<b>Hai selezionato: </b>
+						<span class="file_name">---</span>
+					</span>
+				</div>
+				<input type="hidden" name="s" value="train">
+				<input type="file" name="train_file" style="display: none">
+			</form>
+			<div id="loading_form" style="text-align: center">
+				<div class="mdl-spinner mdl-js-spinner is-active" style="margin-top: 32px; width: 64px; height: 64px"></div>
+				<h5 style="text-align: center">Caricamento in corso... Attendere, prego!</h5>
+			</div>
 		</div>
 		<script async defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 		<script async defer src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>

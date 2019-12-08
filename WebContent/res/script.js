@@ -26,9 +26,9 @@ const page = {
 			description: "Visualizza lo storico dei dati per questa tipologia."
 		},
 		{
-			bg: "bg-last.jpg",
-			title: "Ultimo Periodo",
-			description: "Visualizza i dati raccolti nell'ultimo periodo."
+			bg: "bg-train.jpg",
+			title: "Addestra Modello",
+			description: "Aggiungi dati reali per arricchire il modello."
 		}
 	],
 	drawerToggle: null,
@@ -187,7 +187,7 @@ const page = {
 						page.fillPrograms();
 						page.fillVariables();
 					}
-					else
+					else if (xhr.status != 0)
 					{
 						alert("Errore durante la ricezione delle variabili: ricevuto Codice HTTP " + xhr.status);
 					}
@@ -209,7 +209,7 @@ const page = {
 			break;
 
 		case 2:
-			actions.lastEpoch();
+			actions.train();
 			break;
 		}
 	}
@@ -309,14 +309,69 @@ const actions = {
 		}
 	},
 	
-	lastEpoch: () => {
-		alert("Non ancora implementato.");
+	train: () => {
+		// Get form to be displayed
+		const form = document.getElementById("train_form").cloneNode(true);
+		const file = form.querySelector("input[type=file]");
+		const name = form.querySelector(".file_name");
+		
+		form.querySelector("button").onclick = () => {
+			file.click();
+		};
+		
+		file.onchange = () => {
+			name.innerHTML = file.files.length ? file.files[0].name : "---";
+		};
+		
+		// Make dialog wider
+		dialog.get().classList.add(actions.DIALOG_WIDE_CLASS);
+		
+		// Display form in dialog
+		dialog.show("Addestramento", form, dialog.sendAndCloseAction);
 	}
 };
 
 const dialog = {
 	element: null,
+	xhr: null,
 	closeAction: {
+		"Chiudi": () => {
+			dialog.hide();
+		}
+	},
+	sendAndCloseAction: {
+		"Invia": () => {
+			console.log("ok");
+			const formData = new FormData(dialog.get().querySelector("form"));
+			
+			dialog.xhr = new XMLHttpRequest();
+			dialog.xhr.open("POST", "Api", true);
+			dialog.xhr.onreadystatechange = () => {
+				if (dialog.xhr.readyState === XMLHttpRequest.DONE)
+				{
+					if (dialog.xhr.status == 200)
+					{
+						// Parse response
+						const response = JSON.parse(dialog.xhr.responseText);
+						
+						console.log(response);
+					}
+					else if (dialog.xhr.status != 0)
+					{
+						alert("Errore durante l'invio dei dati.");
+					}
+					
+					dialog.xhr = null;
+					dialog.hide();
+				}
+			};
+			dialog.xhr.send(formData);
+			
+			{
+				const loading = document.getElementById("loading_form").cloneNode(true);
+				dialog.show(null, loading, dialog.closeAction);
+			}
+		},
 		"Chiudi": () => {
 			dialog.hide();
 		}
@@ -334,9 +389,13 @@ const dialog = {
 		const d = dialog.get();
 		
 		// Set title
-		d.querySelector(".mdl-dialog__title").innerHTML = title;
+		if (title !== null)
+		{
+			d.querySelector(".mdl-dialog__title").innerHTML = title;
+		}
 		
 		// Set content
+		if (contentDom !== null)
 		{
 			const content = d.querySelector(".mdl-dialog__content");
 			while (content.firstChild !== null)
@@ -348,23 +407,29 @@ const dialog = {
 		}
 		
 		// Setup actions
-		const buttons = d.querySelector(".mdl-dialog__actions");
-		
-		while (buttons.firstChild !== null)
+		if (actions !== null)
 		{
-			buttons.removeChild(buttons.firstChild);
+			const buttons = d.querySelector(".mdl-dialog__actions");
+			
+			while (buttons.firstChild !== null)
+			{
+				buttons.removeChild(buttons.firstChild);
+			}
+			
+			Object.keys(actions).forEach((k, i) => {
+				const b = document.createElement("BUTTON");
+				b.setAttribute("class", "mdl-button");
+				b.setAttribute("type", "button");
+				b.onclick = actions[k];
+				b.innerHTML = k;
+				buttons.appendChild(b);
+			});
 		}
 		
-		Object.keys(actions).forEach((k, i) => {
-			const b = document.createElement("BUTTON");
-			b.setAttribute("class", "mdl-button");
-			b.setAttribute("type", "button");
-			b.onclick = actions[k];
-			b.innerHTML = k;
-			buttons.appendChild(b);
-		});
-		
-		d.showModal();
+		if (!d.hasAttribute("open"))
+		{
+			d.showModal();
+		}
 	},
 	
 	hide: () => {
@@ -473,7 +538,7 @@ const dataProvider = {
 						datasets: datasets
 					});
 				}
-				else
+				else if (dataProvider.xhr.status != 0)
 				{
 					alert("Errore durante l'ottenimento dei dati per il grafico.");
 				}
