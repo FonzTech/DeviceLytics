@@ -9,12 +9,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
 import com.google.gson.Gson;
 
 import devicelytics.task.OpValuesGetter;
 import devicelytics.task.OpVarsGetter;
 import devicelytics.task.Task;
+import devicelytics.task.TrainModel;
 
 /**
  * This class acts as a REST Api to provide different types of services for the
@@ -46,6 +48,11 @@ public final class Api extends HttpServlet
 
 			case "values":
 				task = new OpValuesGetter();
+				break;
+				
+			case "train":
+				final Part part = request.getPart("train_file");
+				task = new TrainModel(part.getInputStream());
 				break;
 	
 			default:
