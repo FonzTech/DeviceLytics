@@ -279,7 +279,7 @@ const actions = {
 			close.onclick = () => {
 				parent.removeChild(container);
 			};
-			close.innerHTML = '<i class="material-icons" style="vertical-align: bottom">close</i> Chiudi Questo Grafico';
+			close.innerHTML = '<i class="material-icons" style="vertical-align: bottom">close</i> Destroy this chart';
 			container.appendChild(close);
 			
 			dataProvider.get((data) => {
