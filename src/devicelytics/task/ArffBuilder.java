@@ -12,9 +12,10 @@ import weka.core.converters.CSVLoader;
 
 public final class ArffBuilder extends Task
 {
-	protected final File source;
-	protected boolean result;
-	protected File output;
+	private final File source;
+	private boolean result;
+	private File output;
+	private String error;
 
 	/**
 	 * Built ARFF dataset file for processing in Weka.
@@ -62,6 +63,7 @@ public final class ArffBuilder extends Task
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			error = e.getMessage();
 		}		
 	}
 
@@ -73,7 +75,7 @@ public final class ArffBuilder extends Task
 	@Override
 	public final Object getResult()
 	{
-		return new Result(result, output);
+		return new Result(result, output, error);
 	}
 	
 	// Export result
@@ -81,9 +83,10 @@ public final class ArffBuilder extends Task
 	@Getter
 	@ToString
 	@EqualsAndHashCode
-	public static final class Result
+	protected static final class Result
 	{
-		protected final boolean result;
+		protected final Boolean result;
 		protected final File output;
+		protected final String error;
 	}
 }

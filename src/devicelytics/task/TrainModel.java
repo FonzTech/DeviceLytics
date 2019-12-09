@@ -22,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 public final class TrainModel extends DatabaseTask
 {
 	private final InputStream inputStream;
-	private String error;
+	
+	private boolean success;
+	private String message;
 	
 	@Override
 	public final void doInBackground()
@@ -43,24 +45,46 @@ public final class TrainModel extends DatabaseTask
 			arff.start();
 			arff.join();
 			
-			final File arffFile = ((ArffBuilder.Result) arff.getResult()).getOutput();
+			final File arffFile;
+			{
+				final ArffBuilder.Result result = (ArffBuilder.Result) arff.getResult();
+				if (!result.getResult())
+				{
+					throw new RuntimeException("Could not build the ARFF file from the supplied CSV. Error is: " + result.getError());
+				}
+				arffFile = result.getOutput();
+			}
 			
 			final ColumnToPredict columnToPredict = getColumnToPredict(csvFile);
 			final ModelEnrichment pmt = new ModelEnrichment(arffFile, columnToPredict);
 			pmt.start();
 			pmt.join();
+			
+			{
+				final ModelEnrichment.Result result = (ModelEnrichment.Result) pmt.getResult();
+				if (result.getResult())
+				{
+					success = true;
+				}
+				else
+				{
+					throw new RuntimeException("Could not apply the learning algorithm. Error is: " + result.getError());
+				}
+			}
+			
+			message = "The Model was trained correctly.";
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			error = e.getMessage();
+			message = e.getMessage();
 		}
 	}
 
 	@Override
 	public final Object getResult()
 	{
-		return new Result(error);
+		return new Result(success, message);
 	}
 
 	/**
@@ -77,6 +101,7 @@ public final class TrainModel extends DatabaseTask
 
 		final File output = File.createTempFile("csv-", ".csv");
 		output.deleteOnExit();
+		
 		final OutputStream stream = new FileOutputStream(output);
 		stream.write(buffer);
 		stream.close();
@@ -104,13 +129,13 @@ public final class TrainModel extends DatabaseTask
 			if (vars.size() > 0)
 			{
 				scanner.close();
-				throw new RuntimeException("Sono state trovate differenze nelle variabili: " + String.join(", ", vars));
+				throw new RuntimeException("Differences were found between database variables and CSV header: " + String.join(", ", vars));
 			}
 		}
 		else
 		{
 			scanner.close();
-			throw new RuntimeException("Non è stato possibile ottenere l'intestazione del file CSV.");
+			throw new RuntimeException("Could not get CSV header or uploaded file was invalid.");
 		}
 		
 		scanner.close();
@@ -151,7 +176,7 @@ public final class TrainModel extends DatabaseTask
 			scanner.close();
 		}
 		
-		throw new RuntimeException("Non esiste la variabile marcata come dipendente nel database.");
+		throw new RuntimeException("No variable marked as dependent was found in the database.");
 	}
 	
 	/**
@@ -201,6 +226,7 @@ public final class TrainModel extends DatabaseTask
 	@RequiredArgsConstructor
 	public static final class Result
 	{
-		protected final String error;
+		protected final Boolean success;
+		protected final String message;
 	}
 }

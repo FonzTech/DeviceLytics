@@ -17,18 +17,18 @@ const page = {
 	cards: [
 		{
 			bg: "bg-forecast.jpg",
-			title: "Predizioni",
-			description: "Applica le tecniche di predizione dei guasti."
+			title: "Predictions",
+			description: "Apply prediction techniques to data"
 		},
 		{
 			bg: "bg-time.jpg",
-			title: "Storico",
-			description: "Visualizza lo storico dei dati per questa tipologia."
+			title: "History",
+			description: "View data history for selected variables."
 		},
 		{
 			bg: "bg-train.jpg",
-			title: "Addestra Modello",
-			description: "Aggiungi dati reali per arricchire il modello."
+			title: "Train Model",
+			description: "Add new features to the dataset for the model."
 		}
 	],
 	drawerToggle: null,
@@ -189,7 +189,7 @@ const page = {
 					}
 					else if (xhr.status != 0)
 					{
-						alert("Errore durante la ricezione delle variabili: ricevuto Codice HTTP " + xhr.status);
+						alert("Error during variables response. Received HTTP code: " + xhr.status);
 					}
 				}
 			};
@@ -226,7 +226,7 @@ const actions = {
 		dialog.get().classList.add(actions.DIALOG_WIDE_CLASS);
 		
 		// Display form in dialog
-		dialog.show("Predizioni", form, dialog.closeAction);
+		dialog.show("Predictions", form, dialog.closeAction);
 	},
 		
 	history: () => {
@@ -239,8 +239,8 @@ const actions = {
 		// Check if data is available
 		if (!dataProvider.isValid())
 		{
-			const text = document.createTextNode("Devi selezionare almeno un programma / posizione e una variabile!");
-			dialog.show("Avviso", text, dialog.closeAction);
+			const text = document.createTextNode("You must select at least one variables on the left side!");
+			dialog.show("Alert", text, dialog.closeAction);
 			return;
 		}
 		
@@ -327,7 +327,7 @@ const actions = {
 		dialog.get().classList.add(actions.DIALOG_WIDE_CLASS);
 		
 		// Display form in dialog
-		dialog.show("Addestramento", form, dialog.sendAndCloseAction);
+		dialog.show("Training", form, dialog.sendAndCloseAction);
 	}
 };
 
@@ -354,10 +354,16 @@ const dialog = {
 						const response = JSON.parse(dialog.xhr.responseText);
 						
 						// Show error if required
-						if ("error" in response && response.error !== null)
-						{
-							alert("Errore riscontrato: " + response.error);
-						}
+						const message = document.getElementById("message_form").cloneNode(true);
+						const comp = [
+							message.querySelector("h5"),
+							message.querySelector("div")
+						];
+
+						comp[0].innerHTML = response.success ? "Congratulations" : "Error encountered";
+						comp[1].innerHTML = response.message;
+
+						dialog.show(null, message, dialog.closeAction);
 					}
 					else if (dialog.xhr.status != 0)
 					{
@@ -365,7 +371,6 @@ const dialog = {
 					}
 					
 					dialog.xhr = null;
-					dialog.hide();
 				}
 			};
 			dialog.xhr.send(formData);
@@ -543,7 +548,7 @@ const dataProvider = {
 				}
 				else if (dataProvider.xhr.status != 0)
 				{
-					alert("Errore durante l'ottenimento dei dati per il grafico.");
+					alert("Error during the request for the chart data.");
 				}
 				
 				dataProvider.xhr = null;

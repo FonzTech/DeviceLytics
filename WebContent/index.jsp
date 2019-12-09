@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width">
-		<title>Cruscotto</title>
+		<title>DeviceLytics Dashboard</title>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 		<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-light_blue.min.css">
 		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
@@ -13,7 +13,7 @@
 	<body onload="page.load(-1)">
 		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
 			<div class="mdl-layout__drawer">
-				<span class="mdl-layout-title">Pannello</span>
+				<span class="mdl-layout-title">Variables</span>
 				<nav class="mdl-navigation side-nav">
 					<div class="smaller">
 						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-focused">
@@ -31,7 +31,7 @@
 					<header class="mdl-layout__header" style="display: flex !important">
 						<div class="mdl-layout__header-row">
 							<span class="mdl-layout-title">
-								Visualizza Andamento
+								View Trend
 							</span>
 							<div class="mdl-layout-spacer"></div>
 						</div>
@@ -40,9 +40,11 @@
 				</div>
 				<footer class="mdl-mini-footer">
 					<div class="mdl-mini-footer__left-section">
-						<div class="mdl-logo">Ti &egrave; piaciuta questa applicazione?</div>
+						<div class="mdl-logo">
+							Did you like <a href="https://github.com/FonzTech/DeviceLytics">this application</a>? <a href="https://github.com/FonzTech">Visit me</a> on GitHub.com!
+						</div>
 						<ul class="mdl-mini-footer__link-list">
-							<li><a href="#">Aiuto</a></li>
+							<li><a href="#">Help</a></li>
 						</ul>
 					</div>
 				</footer>
@@ -63,16 +65,16 @@
 		</dialog>
 		<div style="display: none">
 			<form id="predict_form" action="Api" method="post">
-				<h5>Predici Risultato</h5>
+				<h5>Predict Result</h5>
 				<div>
-					Qui puoi caricare il tuo file in formato CSV, senza la variabile target,
-					modo tale che il modello di predizione lo dia in output. È possibile
-					utilizzare questa funzione anche per testare il modello.
+					Here you can upload your CSV file, without the target (dependent) variable,
+					so the prediction model gives you the desired output. It is possible to
+					use this functionality to test the model.
 				</div>
 				<div style="margin-top: 16px">
 					<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
-					<span>
-						<b>Hai selezionato: </b>
+					<span style="margin-left: 16px">
+						<b>You chose: </b>
 						<span class="file_name">---</span>
 					</span>
 				</div>
@@ -80,15 +82,15 @@
 				<input type="file" name="predict_file" style="display: none">
 			</form>
 			<form id="train_form" action="Api" method="post">
-				<h5>Addrestra Modello</h5>
+				<h5>Train Model</h5>
 				<div>
-					Qui puoi caricare il tuo file in formato CSV, in modo tale da addestrare il
-					modello che consente di effettuare le predizioni sui dati attuali e futuri.
+					Here you can upload your CSV file, in such a way the model is trained to
+					make better predictions in the future.
 				</div>
 				<div style="margin-top: 16px">
 					<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
-					<span>
-						<b>Hai selezionato: </b>
+					<span style="margin-left: 16px">
+						<b>You chose: </b>
 						<span class="file_name">---</span>
 					</span>
 				</div>
@@ -97,7 +99,11 @@
 			</form>
 			<div id="loading_form" style="text-align: center">
 				<div class="mdl-spinner mdl-js-spinner is-active" style="margin-top: 32px; width: 64px; height: 64px"></div>
-				<h5 style="text-align: center">Caricamento in corso... Attendere, prego!</h5>
+				<h5 style="margin-bottom: 0; text-align: center">Loading... Please, wait!</h5>
+			</div>
+			<div id="message_form">
+				<h5></h5>
+				<div></div>
 			</div>
 		</div>
 		<script async defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>

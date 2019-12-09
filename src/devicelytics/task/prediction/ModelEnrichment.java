@@ -3,6 +3,7 @@ package devicelytics.task.prediction;
 import java.io.File;
 
 import devicelytics.model.ColumnToPredict;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instances;
@@ -13,6 +14,9 @@ public final class ModelEnrichment extends AbstractPrediction
 {
 	private final File arffFile;
 	private final ColumnToPredict columnToPredict;
+	
+	private boolean result;
+	private String error; 
 
 	@Override
 	protected final void doInBackground()
@@ -29,16 +33,27 @@ public final class ModelEnrichment extends AbstractPrediction
 			// Build model
 			final LinearRegression model = (LinearRegression) classifier;
 			model.buildClassifier(dataset);
+			
+			result = true;
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			error = e.getMessage();
 		}
 	}
 
 	@Override
 	public final Object getResult()
 	{
-		return null;
+		return new Result(result, error);
+	}
+	
+	@RequiredArgsConstructor
+	@Getter
+	public static final class Result
+	{
+		protected final Boolean result;
+		protected final String error;
 	}
 }
