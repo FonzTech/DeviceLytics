@@ -44,8 +44,10 @@ public final class ArffBuilder extends Task
 			final CSVLoader loader = new CSVLoader();
 			loader.setSource(source);
 
+			/*
 			final String[] options = { "-H" };
 			loader.setOptions(options);
+			*/
 
 			final Instances data = loader.getDataSet();
 
@@ -53,9 +55,6 @@ public final class ArffBuilder extends Task
 			saver.setInstances(data);
 			saver.setFile(output);
 			saver.writeBatch();
-
-			// Delete source CSV file
-			source.delete();
 
 			// Set flag
 			result = true;
