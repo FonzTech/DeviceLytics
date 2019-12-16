@@ -6,11 +6,13 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import devicelytics.model.ColumnToPredict;
 import devicelytics.task.ArffBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 @RequiredArgsConstructor
 public class Prediction extends AbstractPrediction
@@ -19,7 +21,7 @@ public class Prediction extends AbstractPrediction
 
 	private boolean success;
 	private String message;
-	private HashMap<Instance, Double> features;
+	private ArrayList<Feature> features;
 	
 	@Override
 	protected final void doTaskInBackground()
@@ -54,13 +56,31 @@ public class Prediction extends AbstractPrediction
 			// Now predict the target value
 			if (dataset.numInstances() > 0)
 			{
-				features = new HashMap<>();
+				features = new ArrayList<>();
 				
 				for (int i = 0; i < dataset.numInstances(); ++i)
 				{
 					final Instance instance = dataset.instance(i);
-					double value = classifier.classifyInstance(instance);
-					features.put(instance, value);
+					final double label = classifier.classifyInstance(instance);
+					
+					final HashMap<String, String> attributes = new HashMap<>();
+					for (int j = 0; j < instance.numAttributes(); ++j)
+					{
+						String value;
+						
+						try
+						{
+							value = instance.stringValue(j);
+						}
+						catch (Exception e)
+						{
+							value = Double.toString(instance.value(j));
+						}
+						
+						attributes.put(instance.attribute(j).name(), value);
+					}
+					
+					features.add(new Feature(attributes, Math.round(label)));
 				}
 			}
 			
@@ -86,6 +106,15 @@ public class Prediction extends AbstractPrediction
 	{
 		protected final Boolean success;
 		protected final String message;
-		protected final HashMap<Instance, Double> features;
+		protected final ArrayList<Feature> features;
+	}
+
+	// Feature class
+	@RequiredArgsConstructor
+	@ToString
+	protected static final class Feature
+	{
+		protected final HashMap<String, String> instance;
+		protected final double label;
 	}
 }
