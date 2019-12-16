@@ -1,22 +1,24 @@
-package devicelytics.task.prediction;
+package devicelytics.task;
 
 import java.io.File;
 
 import devicelytics.model.ColumnToPredict;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import weka.classifiers.Classifier;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
 @RequiredArgsConstructor
-public final class ModelEnrichment extends AbstractPrediction
+public final class ModelEnrichment extends DatabaseTask
 {
 	private final File arffFile;
 	private final ColumnToPredict columnToPredict;
+	private final Classifier classifier;
 	
 	private boolean result;
-	private String error; 
+	private String error;
 
 	@Override
 	protected final void doInBackground()

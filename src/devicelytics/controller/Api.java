@@ -16,7 +16,8 @@ import com.google.gson.Gson;
 import devicelytics.task.OpValuesGetter;
 import devicelytics.task.OpVarsGetter;
 import devicelytics.task.Task;
-import devicelytics.task.TrainModel;
+import devicelytics.task.prediction.Prediction;
+import devicelytics.task.prediction.TrainModel;
 
 /**
  * This class acts as a REST Api to provide different types of services for the
@@ -51,8 +52,17 @@ public final class Api extends HttpServlet
 				break;
 				
 			case "train":
-				final Part part = request.getPart("train_file");
-				task = new TrainModel(part.getInputStream());
+				{
+					final Part part = request.getPart("train_file");
+					task = new TrainModel(part.getInputStream());
+				}
+				break;
+				
+			case "predict":
+				{
+					final Part part = request.getPart("predict_file");
+					task = new Prediction(part.getInputStream());
+				}
 				break;
 	
 			default:

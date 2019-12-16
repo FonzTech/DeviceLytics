@@ -219,14 +219,7 @@ const actions = {
 	DIALOG_WIDE_CLASS: "dialog-wide",
 		
 	predict: () => {
-		// Get form to be displayed
-		const form = document.getElementById("predict_form").cloneNode(true);
-		
-		// Make dialog wider
-		dialog.get().classList.add(actions.DIALOG_WIDE_CLASS);
-		
-		// Display form in dialog
-		dialog.show("Predictions", form, dialog.closeAction);
+		actions.fileUpload("predict_form", "Predictions");
 	},
 		
 	history: () => {
@@ -310,8 +303,12 @@ const actions = {
 	},
 	
 	train: () => {
+		actions.fileUpload("train_form", "Training");
+	},
+	
+	fileUpload: (id, title) => {
 		// Get form to be displayed
-		const form = document.getElementById("train_form").cloneNode(true);
+		const form = document.getElementById(id).cloneNode(true);
 		const file = form.querySelector("input[type=file]");
 		const name = form.querySelector(".file_name");
 		
@@ -327,7 +324,7 @@ const actions = {
 		dialog.get().classList.add(actions.DIALOG_WIDE_CLASS);
 		
 		// Display form in dialog
-		dialog.show("Training", form, dialog.sendAndCloseAction);
+		dialog.show(title, form, dialog.sendAndCloseAction);	
 	}
 };
 

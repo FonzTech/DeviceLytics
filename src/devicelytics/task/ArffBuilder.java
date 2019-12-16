@@ -83,7 +83,7 @@ public final class ArffBuilder extends Task
 	@Getter
 	@ToString
 	@EqualsAndHashCode
-	protected static final class Result
+	public static final class Result
 	{
 		protected final Boolean result;
 		protected final File output;
