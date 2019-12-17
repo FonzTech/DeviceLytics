@@ -6,6 +6,9 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 import java.io.File;
 import java.io.InputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -21,6 +24,7 @@ public class Prediction extends AbstractPrediction
 
 	private boolean success;
 	private String message;
+	private HashMap<String, String> columns;
 	private ArrayList<Feature> features;
 	
 	@Override
@@ -61,7 +65,18 @@ public class Prediction extends AbstractPrediction
 				for (int i = 0; i < dataset.numInstances(); ++i)
 				{
 					final Instance instance = dataset.instance(i);
-					final double label = classifier.classifyInstance(instance);
+					double label = -1;
+					
+					try
+					{
+						label = classifier.classifyInstance(instance);
+						instance.setClassValue(label);
+						System.out.println(instance.classAttribute().value((int) classifier.classifyInstance(instance)));
+					}
+					catch (final NullPointerException ex)
+					{
+						throw new RuntimeException("The model has been not trained yet.");
+					}
 					
 					final HashMap<String, String> attributes = new HashMap<>();
 					for (int j = 0; j < instance.numAttributes(); ++j)
@@ -84,6 +99,11 @@ public class Prediction extends AbstractPrediction
 				}
 			}
 			
+			// Get columns
+			columns = new HashMap<>();
+			getColumns();
+			
+			// Success
 			message = "The prediction was done correctly.";
 			success = true;
 		}
@@ -97,7 +117,26 @@ public class Prediction extends AbstractPrediction
 	@Override
 	public final Object getResult()
 	{
-		return new Result(success, message, features);
+		return new Result(success, message, columns, features);
+	}
+	
+	private void getColumns()
+	{		
+		try
+		{
+			final Statement stmt = connection.createStatement();
+			final ResultSet rs = stmt.executeQuery("SELECT csv_label, column_label FROM opvar");
+			
+			while (rs.next())
+			{
+				columns.put(rs.getString(1), rs.getString(2));
+			}
+			stmt.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	// Getter result
@@ -106,6 +145,7 @@ public class Prediction extends AbstractPrediction
 	{
 		protected final Boolean success;
 		protected final String message;
+		protected final HashMap<String, String> columns;
 		protected final ArrayList<Feature> features;
 	}
 

@@ -359,8 +359,65 @@ const dialog = {
 
 						comp[0].innerHTML = response.success ? "Congratulations" : "Error encountered";
 						comp[1].innerHTML = response.message;
+						
+						const isTableShown = "columns" in response;
+						
+						if (isTableShown)
+						{							
+							const keys = Object.keys(response.columns);
+							keys.unshift(null);
+							
+							// Container
+							const div = document.createElement("DIV");
+							div.setAttribute("class", "table-container");
+							message.appendChild(div);
+							
+							// Table
+							const table = document.createElement("TABLE");
+							table.setAttribute("class", "mdl-data-table mdl-js-data-table mdl-shadow--2dp");
+							div.appendChild(table);
+
+							// Head of table
+							{
+								const thead = document.createElement("THEAD");
+								table.appendChild(thead);
+
+								const tr = document.createElement("TR");
+								thead.appendChild(tr);
+								
+								keys.forEach((e) => {
+									const th = document.createElement("TH");
+									th.setAttribute("data-key", e);
+									th.innerHTML = e === null ? "Target" : response.columns[e];
+									tr.appendChild(th);
+								});
+							}
+
+							// Body of table
+							{
+								const tbody = document.createElement("TBODY");
+								table.appendChild(tbody);
+								
+								response.features.forEach((e) => {
+									const tr = document.createElement("TR");
+									tbody.appendChild(tr);
+									
+									keys.forEach((k) => {
+										const td = document.createElement("TD");
+										td.innerHTML = k === null ? e.label : e.instance[k];
+										tr.appendChild(td);
+									});
+								});
+							}
+						}
 
 						dialog.show(null, message, dialog.closeAction);
+
+						if (isTableShown)
+						{
+							dialog.get().classList.remove("dialog-wide");
+							dialog.get().classList.add("dialog-ultrawide");
+						}
 					}
 					else if (dialog.xhr.status != 0)
 					{
@@ -435,6 +492,9 @@ const dialog = {
 		{
 			d.showModal();
 		}
+
+		d.classList.add("dialog-wide");
+		d.classList.remove("dialog-ultrawide");
 	},
 	
 	hide: () => {
