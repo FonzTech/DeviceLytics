@@ -70,8 +70,7 @@ public class Prediction extends AbstractPrediction
 					try
 					{
 						label = classifier.classifyInstance(instance);
-						instance.setClassValue(label);
-						System.out.println(instance.classAttribute().value((int) classifier.classifyInstance(instance)));
+						// instance.setClassValue(label);
 					}
 					catch (final NullPointerException ex)
 					{
@@ -95,7 +94,7 @@ public class Prediction extends AbstractPrediction
 						attributes.put(instance.attribute(j).name(), value);
 					}
 					
-					features.add(new Feature(attributes, Math.round(label)));
+					features.add(new Feature(attributes, (int) label));
 				}
 			}
 			

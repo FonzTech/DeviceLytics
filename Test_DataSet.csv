@@ -1,2 +1,2 @@
 Program,Position,Error,Weld_speed,Command_current,Current_output,Command_voltage,Voltage_output,Short_count,Pulse_frequency,Motor_current,Wire_speed,Instant_arc_lack_time
-SALDATURA OP2,P093,?,0.0,0,0,10,10,0,0,0,0,0.0
+2,94,1,0.0,0,0,0.4,0.3,0,0,0.12,0.00,0.0
