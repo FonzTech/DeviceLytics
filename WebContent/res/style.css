@@ -111,6 +111,9 @@ body {
 	overflow: auto;
 	box-shadow: 0 0 16px rgba(0, 0, 0, 0.25)
 }
+.table-container table {
+	min-width: 100%
+}
 .table-container td,
 .table-container tr {
 	text-align: center
