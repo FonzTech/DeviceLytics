@@ -66,3 +66,4 @@ transaction-logs
 secrets.yml
 .gradletasknamecache
 .sts4-cache
+devicelytics.model
