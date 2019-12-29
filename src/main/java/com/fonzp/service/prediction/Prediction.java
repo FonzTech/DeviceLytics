@@ -124,7 +124,7 @@ public class Prediction extends AbstractPrediction
 			message = "The prediction was done correctly.";
 			success = true;
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			e.printStackTrace();
 			message = e.getMessage();

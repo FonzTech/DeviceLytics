@@ -359,7 +359,7 @@ const dialog = {
 						comp[0].innerHTML = response.success ? "Congratulations" : "Error encountered";
 						comp[1].innerHTML = response.message;
 						
-						const isTableShown = "columns" in response;
+						const isTableShown = "columns" in response && response.columns !== null;
 						
 						if (isTableShown)
 						{							
