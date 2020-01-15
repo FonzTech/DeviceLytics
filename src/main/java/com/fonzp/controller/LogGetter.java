@@ -1,7 +1,9 @@
 package com.fonzp.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -22,29 +24,66 @@ public final class LogGetter
 {
     @PersistenceContext
     private EntityManager em;
-    
+
+	@SuppressWarnings("unchecked")    
 	@PostMapping("/api/get_logs")
 	public final Object getOpLogs(@RequestBody final LogRequest logRequest)
-	{		
-		final ArrayList<HashMap<String, Object>> rows = new ArrayList<>();
-
-		final Query q = em.createNativeQuery("SELECT id, " + String.join(",", logRequest.getVars()) + " FROM oplog WHERE program = :program AND position = :position");
-		q.setParameter("position", logRequest.getPosition());
-		q.setParameter("program", logRequest.getProgram());
-		
-		for (final Object result : q.getResultList())
+	{
+		if (logRequest.isBoxPlot())
 		{
-			final HashMap<String, Object> row = new HashMap<>();
+			final HashMap<String, ArrayList<Object>> map = new HashMap<>();
 			
-			final Object[] array = (Object[]) result;
-			for (int i = 0; i < array.length; ++i)
+			// Get program and positions
+			List<Object[]> params;
 			{
-				row.put(i == 0 ? "id" : logRequest.getVars()[i - 1], array[i]);
+				final Query q = em.createNativeQuery("SELECT program, position FROM oplog GROUP BY program, position");
+				params = (List<Object[]>) q.getResultList();
 			}
 			
-			rows.add(row);
+			for (final String var : logRequest.getVars())
+			{
+				for (final Object[] param : params)
+				{
+					final Query q = em.createNativeQuery("SELECT " + var.replaceAll("/\\s/", "") + " FROM oplog WHERE program = :program AND position = :position ORDER BY id ASC");
+					q.setParameter("program", param[0]);
+					q.setParameter("position", param[1]);
+					
+					final ArrayList<Object> list = map.get(var);
+					if (list != null)
+					{
+						list.add(q.getResultList());
+					}
+					else
+					{
+						map.put(var, new ArrayList<Object>(Arrays.asList(q.getResultList())));
+					}
+				}
+			}
+			
+			return map;
 		}
-		
-		return rows;
+		else
+		{
+			final ArrayList<HashMap<String, Object>> rows = new ArrayList<>();
+			
+			final Query q = em.createNativeQuery("SELECT id, " + String.join(",", logRequest.getVars()).replaceAll("/\\s/", "") + " FROM oplog WHERE program = :program AND position = :position ORDER BY id ASC");
+			q.setParameter("position", logRequest.getPosition());
+			q.setParameter("program", logRequest.getProgram());
+			
+			for (final Object result : q.getResultList())
+			{
+				final HashMap<String, Object> row = new HashMap<>();
+				
+				final Object[] array = (Object[]) result;
+				for (int i = 0; i < array.length; ++i)
+				{
+					row.put(i == 0 ? "id" : logRequest.getVars()[i - 1], array[i]);
+				}
+				
+				rows.add(row);
+			}
+			
+			return rows;
+		}
 	}
 }

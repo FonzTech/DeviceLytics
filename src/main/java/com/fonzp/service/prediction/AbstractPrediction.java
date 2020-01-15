@@ -18,7 +18,7 @@ import com.fonzp.model.ColumnToPredict;
 import com.fonzp.service.DatabaseTask;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.trees.RandomForest;
 import weka.core.SerializationHelper;
 
 public abstract class AbstractPrediction extends DatabaseTask
@@ -200,7 +200,7 @@ public abstract class AbstractPrediction extends DatabaseTask
 		}
 		else
 		{
-			classifier = new LinearRegression();
+			classifier = new RandomForest();
 			System.out.println(getClass().getSimpleName() + " - Classifier was created.");
 		}
 	}

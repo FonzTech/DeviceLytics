@@ -50,7 +50,7 @@ body {
 	transition: transform 0.2s ease-out;
 	margin-top: 32px;
 	display: inline-flex !important;
-	width: 32%;
+	width: 24%;
 	cursor: pointer;
 	transform-origin: 50% 50%;
 	transform: scale(1)
@@ -89,7 +89,7 @@ body {
 .chart-close {
 	position: absolute;
 	right: 32px;
-	top: 32px;
+	top: 8px;
 	font-size: 16px;
 	text-decoration: none
 }

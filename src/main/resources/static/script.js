@@ -16,19 +16,24 @@ const page = {
 	items: [],
 	cards: [
 		{
-			bg: "bg-forecast.jpg",
-			title: "Predictions",
-			description: "Apply prediction techniques to data"
-		},
-		{
 			bg: "bg-time.jpg",
 			title: "History",
 			description: "View data history for selected variables."
 		},
 		{
+			bg: "bg-time.jpg",
+			title: "Box Plot",
+			description: "View box plot for selected variables."
+		},
+		{
 			bg: "bg-train.jpg",
 			title: "Train Model",
 			description: "Add new features to the dataset for the model."
+		},
+		{
+			bg: "bg-forecast.jpg",
+			title: "Predictions",
+			description: "Apply prediction techniques to data"
 		}
 	],
 	drawerToggle: null,
@@ -198,15 +203,19 @@ const page = {
 		switch (actionId)
 		{
 		case 0:
-			actions.predict();
+			actions.history(false);
 			break;
-
+			
 		case 1:
-			actions.history();
+			actions.history(true);
 			break;
 
 		case 2:
 			actions.train();
+			break;
+
+		case 3:
+			actions.predict();
 			break;
 		}
 	}
@@ -219,7 +228,7 @@ const actions = {
 		actions.fileUpload("predict_form", "Predictions");
 	},
 		
-	history: () => {
+	history: (isBoxPlot) => {
 		// Make dialog normal
 		dialog.get().classList.remove(actions.DIALOG_WIDE_CLASS);
 		
@@ -273,11 +282,18 @@ const actions = {
 			container.appendChild(close);
 			
 			dataProvider.get((data) => {
+				// Set width
+				if (isBoxPlot)
+				{
+					canvas.setAttribute("width", parseInt(data.labels.length * 256));
+				}
+				
+				// Build chart
 				new Chart(canvas, {
-					type: "line",
+					type: isBoxPlot ? "boxplot" : "bar",
 					data: data,
 					options: {
-						responsive: true,
+						responsive: !isBoxPlot,
 						maintainAspectRatio: false,
 						scales: {
 							yAxes: [{
@@ -290,10 +306,13 @@ const actions = {
 							point: {
 								radius: 0
 							}
+						},
+						legend: {
+							position: "bottom"
 						}
 					}
 				});
-			});
+			}, isBoxPlot);
 			
 			componentHandler.upgradeDom();
 		}
@@ -538,7 +557,7 @@ const dataProvider = {
 		return document.getElementById("programs").value != "-1" && Object.keys(dataProvider.variables).length;
 	},
 	
-	get: (callback) => {		
+	get: (callback, isBoxPlot) => {		
 		if (dataProvider.xhr !== null)
 		{
 			dataProvider.xhr.abort();
@@ -549,7 +568,8 @@ const dataProvider = {
 		const formData = {
 			program: program.options[program.selectedIndex].getAttribute("data-program"),
 			position: program.options[program.selectedIndex].getAttribute("data-position"),
-			vars: Object.keys(dataProvider.variables)
+			vars: Object.keys(dataProvider.variables),
+			boxPlot: isBoxPlot
 		};
 		
 		dataProvider.xhr = new XMLHttpRequest();
@@ -566,7 +586,7 @@ const dataProvider = {
 					// Labels and datasets
 					const labels = [];
 					const datasets = [];
-					
+
 					// Iterate through every log
 					Object.keys(dataProvider.variables).forEach((k, i) => {
 						// Get correct color
@@ -579,20 +599,34 @@ const dataProvider = {
 							backgroundColor: "rgba(" + color + ", 0.25)",
 							borderColor: "rgba(" + color + ", 1)",
 							borderWidth: 1,
-							fill: false
+							fill: false,
+							outlierColor: '#999999',
+							padding: 10,
+							itemRadius: 0,
 						};
 						
 						// Fill data
-						response.forEach((e) => {
-							// Fill labels
-							if (!i)
-							{
-								labels.push(e.id);
-							}
+						if (isBoxPlot)
+						{
+							// Push dataset
+							dataset.data = response[k];
 							
-							// Dummy data for dataset
-							dataset.data.push(parseFloat(e[k]));
-						});
+							// Add label
+							labels.push(i + 1);
+						}
+						else
+						{
+							response.forEach((e) => {
+								// Add label
+								if (!i)
+								{
+									labels.push(e.id);
+								}
+								
+								// Dummy data for dataset
+								dataset.data.push(parseFloat(e[k]));
+							});
+						}
 							
 						// Push dataset
 						datasets.push(dataset);

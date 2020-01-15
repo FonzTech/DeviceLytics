@@ -11,7 +11,7 @@ import com.fonzp.service.DatabaseTask;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import weka.classifiers.Classifier;
-import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
@@ -47,7 +47,7 @@ public final class ModelEnrichment extends DatabaseTask
 			dataset.setClassIndex(columnToPredict.getIndex());
 			
 			// Build model
-			final LinearRegression model = (LinearRegression) classifier;
+			final RandomForest model = (RandomForest) classifier;
 			model.buildClassifier(dataset);
 			
 			result = true;
