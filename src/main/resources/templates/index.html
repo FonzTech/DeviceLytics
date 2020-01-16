@@ -16,14 +16,16 @@
 				<span class="mdl-layout-title">Variables</span>
 				<nav class="mdl-navigation side-nav">
 					<div class="smaller">
-						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-focused">
-							<select class="mdl-textfield__input" type="text" id="programs">
-								<option value="-1">---</option>
-							</select>
-							<label class="mdl-textfield__label" for="programs">Program &amp; Position</label>
+					</div>
+					<div class="side-menu padded">
+						<div>
+							You must upload a dataset first.
+						</div>
+						<div style="text-align: center">
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="margin: 16px 0; color: white" onclick="session.load()">Load Dataset</button>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin: 16px 0">Start New Session</button>
 						</div>
 					</div>
-					<div class="side-menu"></div>
 				</nav>
 			</div>
 			<main class="mdl-layout__content" onscroll="page.scroll(this)">
@@ -64,37 +66,9 @@
 			<div class="mdl-dialog__actions"></div>
 		</dialog>
 		<div style="display: none">
-			<form id="predict_form" action="/api/test_model" method="post">
-				<h5>Predict Result</h5>
-				<div>
-					Here you can upload your CSV file, without the target (dependent) variable,
-					so the prediction model gives you the desired output. It is possible to
-					use this functionality to test the model.
-				</div>
-				<div style="margin-top: 16px">
-					<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
-					<span style="margin-left: 16px">
-						<b>You chose: </b>
-						<span class="file_name">---</span>
-					</span>
-				</div>
-				<input type="file" name="test_file" style="display: none">
-			</form>
-			<form id="train_form" action="/api/train_model" method="post">
-				<h5>Train Model</h5>
-				<div>
-					Here you can upload your CSV file, in such a way the model is trained to
-					make better predictions in the future.
-				</div>
-				<div style="margin-top: 16px">
-					<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Carica File</button>
-					<span style="margin-left: 16px">
-						<b>You chose: </b>
-						<span class="file_name">---</span>
-					</span>
-				</div>
-				<input type="file" name="train_file" style="display: none">
-			</form>
+			<div th:replace="fragments/predict_form"></div>
+			<div th:replace="fragments/train_form"></div>
+			<div th:replace="fragments/load_form"></div>
 			<div id="loading_form" style="text-align: center">
 				<div class="mdl-spinner mdl-js-spinner is-active" style="margin-top: 32px; width: 64px; height: 64px"></div>
 				<h5 style="margin-bottom: 0; text-align: center">Loading... Please, wait!</h5>

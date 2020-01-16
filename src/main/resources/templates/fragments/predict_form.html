@@ -1,0 +1,17 @@
+<form id="predict_form" action="/api/test_model" method="post">
+	<h5>Upload set file to make prediction on.</h5>
+	<div>
+		Here you can upload your CSV file. If it contains no target (dependent) variable,
+		the prediction model gives you the desired prediction. If the target variable is
+		present and valued, this functionality is used to test the model, providing you
+		the confusion matrix.
+	</div>
+	<div style="margin-top: 16px">
+		<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Select File</button>
+		<span style="margin-left: 16px">
+			<b>You chose: </b>
+			<span class="file_name">---</span>
+		</span>
+	</div>
+	<input type="file" name="test_file" style="display: none">
+</form>

@@ -106,20 +106,12 @@ public class Prediction extends AbstractPrediction
 						}
 						catch (Exception e)
 						{
-							final double d = instance.value(j);
-							if (j == columnToPredict.getIndex())
-							{
-								value = d >= 0.5 ? "No" : "Yes";
-							}
-							else
-							{
-								value = Double.toString(d);
-							}
+							value = Double.toString(label);
 						}
-						
+
 						attributes.put(instance.attribute(j).name(), value);
 					}
-					
+
 					features.add(new Feature(attributes, (int) label));
 				}
 			}

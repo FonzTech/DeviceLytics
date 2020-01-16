@@ -1,0 +1,23 @@
+<form id="load_form" action="/api/load_dataset" method="post">
+	<h5>Populate current session with data.</h5>
+	<div>
+		Here you can upload your CSV file, in such a way the current session
+		is populated with the supplied data, so you can plot graphs and statistics.
+		You must also specify a field separator string (or a single character).
+		If no separator is supplied, the colon character (<b>,</b>) is used.
+	</div>
+	<div style="margin-top: 16px; display: flex; flex-direction: row; align-items: center">
+		<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 128px">
+			<input class="mdl-textfield__input" type="text" id="field-sep" name="separator" value=",">
+			<label class="mdl-textfield__label" for="field-sep">Field Separator</label>
+		</div>
+		<div style="flex: 1; padding-left: 32px; box-sizing: border-box">
+			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Select File</button>
+			<span style="margin-left: 16px">
+				<b>You chose: </b>
+				<span class="file_name">---</span>
+			</span>
+		</div>
+	</div>
+	<input type="file" name="dataset_file" style="display: none">
+</form>

@@ -2,14 +2,17 @@ package com.fonzp.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.naming.NamingException;
 import javax.persistence.EntityManager;
+import javax.sql.DataSource;
 
-import org.springframework.orm.jpa.EntityManagerFactoryInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class DatabaseTask extends Task
 {
-	protected static Connection connection;
+	@Autowired
+	protected DataSource ds;
+	
+	protected Connection connection;
 	
 	public DatabaseTask()
 	{
@@ -28,7 +31,7 @@ public abstract class DatabaseTask extends Task
 	{
 		try
 		{
-			connection = getDatabaseConnection();
+			connection = ds.getConnection();
 		}
 		catch (final SQLException e)
 		{
@@ -51,25 +54,5 @@ public abstract class DatabaseTask extends Task
 			}
 			connection = null;
 		}
-	}
-	
-	/**
-	 * Get database connection using the credentials defined in the
-	 * context configuration file.
-	 *
-	 * @return Connection to database on success, null on failure.
-	 *
-	 * @throws NamingException creation of context or data source lookup fails.
-	 * @throws SQLException failure while getting database connection.
-	 */
-	protected final Connection getDatabaseConnection() throws SQLException
-	{
-		if (connection != null)
-		{
-			return connection;
-		}
-		
-		final EntityManagerFactoryInfo info = (EntityManagerFactoryInfo) getEntityManager().getEntityManagerFactory();
-		return info.getDataSource().getConnection();
 	}
 }

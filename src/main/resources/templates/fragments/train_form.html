@@ -1,0 +1,15 @@
+<form id="train_form" action="/api/train_model" method="post">
+	<h5>Build the prediction model.</h5>
+	<div>
+		Here you can upload your CSV file, in such a way the model is trained to
+		make better predictions in the future.
+	</div>
+	<div style="margin-top: 16px">
+		<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Select File</button>
+		<span style="margin-left: 16px">
+			<b>You chose: </b>
+			<span class="file_name">---</span>
+		</span>
+	</div>
+	<input type="file" name="train_file" style="display: none">
+</form>

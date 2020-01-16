@@ -15,10 +15,11 @@ body {
 .page-content {
 	flex: 1
 }
-.side-nav > .smaller {
+.side-nav .padded {
 	padding-left: 16px;
 	padding-right: 16px
 }
+/*
 .side-menu > div {
 	display: flex !important;
 	flex-direction: row;
@@ -26,6 +27,7 @@ body {
 	align-items: center;
 	padding-left: 24px !important
 }
+*/
 .side-menu > div > label {
 	width: auto
 }

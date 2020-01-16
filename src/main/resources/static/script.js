@@ -12,7 +12,7 @@ const utility = {
 };
 
 const page = {
-	categories: [],
+	xhr: null,
 	items: [],
 	cards: [
 		{
@@ -58,32 +58,6 @@ const page = {
 	scroll: (o) => {
 		const toggle = page.getDrawerToggle();
 		toggle.style.color = o.scrollTop > toggle.offsetHeight / 2 ? "black" : "white";
-	},
-	
-	fillPrograms: () => {
-		// Get programs list
-		const programs = document.getElementById("programs");
-		
-		// Remove variables from programs list
-		while (programs.options.length)
-		{
-			programs.remove(0);
-		}
-		
-		// Repopulate programs
-		if (page.categories.length)
-		{
-			page.categories.forEach((e, index) => {
-				const opt = new Option(e.program + " - " + e.position, index);
-				opt.setAttribute("data-program", e.program);
-				opt.setAttribute("data-position", e.position);
-				programs.options.add(opt);
-			});
-		}
-		else
-		{
-			programs.options.add(new Option("---", -1));
-		}
 	},
 	
 	fillVariables: () => {		
@@ -172,31 +146,6 @@ const page = {
 		{
 			parent.appendChild(document.createElement("HR"));
 		}
-		
-		// Check if variables should be loaded
-		if (index == -1)
-		{
-			const xhr = new XMLHttpRequest();
-			xhr.open("POST", "/api/get_vars", true);
-			xhr.onreadystatechange = () => {
-				if (xhr.readyState === XMLHttpRequest.DONE)
-				{
-					if (xhr.status == 200)
-					{
-						const response = JSON.parse(xhr.responseText);
-						page.categories = response.categories;
-						page.items = response.variables;
-						page.fillPrograms();
-						page.fillVariables();
-					}
-					else if (xhr.status != 0)
-					{
-						alert("Error during variables response. Received HTTP code: " + xhr.status);
-					}
-				}
-			};
-			xhr.send();
-		}
 	},
 	
 	clickCard: (actionId) => {
@@ -218,13 +167,14 @@ const page = {
 			actions.predict();
 			break;
 		}
-	}
+	},
 };
 
 const actions = {
 	DIALOG_WIDE_CLASS: "dialog-wide",
 		
 	predict: () => {
+		dialog.actions = null;
 		actions.fileUpload("predict_form", "Predictions");
 	},
 		
@@ -319,6 +269,7 @@ const actions = {
 	},
 	
 	train: () => {
+		dialog.actions = null;
 		actions.fileUpload("train_form", "Training");
 	},
 	
@@ -340,20 +291,23 @@ const actions = {
 		dialog.get().classList.add(actions.DIALOG_WIDE_CLASS);
 		
 		// Display form in dialog
-		dialog.show(title, form, dialog.sendAndCloseAction);	
+		dialog.show(title, form, dialog.sendAndCloseAction);
+		
+		return form;
 	}
 };
 
 const dialog = {
 	element: null,
 	xhr: null,
+	callbacks: null,
 	closeAction: {
-		"Chiudi": () => {
+		"Close": () => {
 			dialog.hide();
 		}
 	},
 	sendAndCloseAction: {
-		"Invia": () => {
+		"Send": () => {
 			const form = dialog.get().querySelector("form");
 			
 			const formData = new FormData(form);
@@ -367,6 +321,22 @@ const dialog = {
 					{
 						// Parse response
 						const response = JSON.parse(dialog.xhr.responseText);
+						
+						// Launch callbacks
+						if (dialog.callbacks !== null)
+						{
+							if (response.success)
+							{
+								if (dialog.callbacks.success !== null)
+								{
+									dialog.callbacks.success();
+								}
+							}
+							else if (dialog.callbacks.failure !== null)
+							{
+								dialog.callbacks.failure();
+							}
+						}
 						
 						// Show error if required
 						const message = document.getElementById("message_form").cloneNode(true);
@@ -383,6 +353,7 @@ const dialog = {
 						if (isTableShown)
 						{							
 							const keys = Object.keys(response.columns);
+							keys.unshift(null);
 							
 							// Container
 							const div = document.createElement("DIV");
@@ -405,7 +376,7 @@ const dialog = {
 								keys.forEach((e) => {
 									const th = document.createElement("TH");
 									th.setAttribute("data-key", e);
-									th.innerHTML = response.columns[e];
+									th.innerHTML = e === null ? "Label" : response.columns[e];
 									tr.appendChild(th);
 								});
 							}
@@ -421,7 +392,7 @@ const dialog = {
 									
 									keys.forEach((k) => {
 										const td = document.createElement("TD");
-										td.innerHTML = e.instance[k];
+										td.innerHTML = k === null ? e.label : e.instance[k];
 										tr.appendChild(td);
 									});
 								});
@@ -446,12 +417,13 @@ const dialog = {
 			};
 			dialog.xhr.send(formData);
 			
+			// Show loading
 			{
 				const loading = document.getElementById("loading_form").cloneNode(true);
 				dialog.show(null, loading, dialog.closeAction);
 			}
 		},
-		"Chiudi": () => {
+		"Close": () => {
 			dialog.hide();
 		}
 	},
@@ -631,6 +603,7 @@ const dataProvider = {
 						datasets.push(dataset);
 					});
 					
+					// Launch callback
 					callback({
 						labels: labels,
 						datasets: datasets
@@ -645,5 +618,44 @@ const dataProvider = {
 			}
 		};
 		dataProvider.xhr.send(JSON.stringify(formData));
+	}
+};
+
+const session = {
+	xhr: null,
+
+	load: () => {
+		dialog.callbacks = {
+			success: () => {
+				session.getVars();
+			}
+		};
+		session.form = actions.fileUpload("load_form", "Load Dataset");
+	},
+	
+	getVars: () => {
+		if (session.xhr !== null)
+		{
+			session.xhr.abort();
+		}
+		
+		session.xhr = new XMLHttpRequest();
+		session.xhr.open("POST", "/api/get_vars", true);
+		session.xhr.onreadystatechange = () => {
+			if (session.xhr.readyState === XMLHttpRequest.DONE)
+			{
+				if (session.xhr.status == 200)
+				{
+					const response = JSON.parse(session.xhr.responseText);
+					page.items = response.data;
+					page.fillVariables();
+				}
+				else if (session.xhr.status != 0)
+				{
+					alert("Error while getting variables. Received HTTP code: " + session.xhr.status);
+				}
+			}
+		};
+		session.xhr.send();
 	}
 };
