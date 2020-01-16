@@ -88,7 +88,7 @@ public class Prediction extends AbstractPrediction
 					try
 					{
 						label = classifier.classifyInstance(instance);
-						// instance.setClassValue(label);
+						instance.setClassValue(label);
 					}
 					catch (final NullPointerException ex)
 					{
@@ -106,7 +106,15 @@ public class Prediction extends AbstractPrediction
 						}
 						catch (Exception e)
 						{
-							value = Double.toString(instance.value(j));
+							final double d = instance.value(j);
+							if (j == columnToPredict.getIndex())
+							{
+								value = d >= 0.5 ? "No" : "Yes";
+							}
+							else
+							{
+								value = Double.toString(d);
+							}
 						}
 						
 						attributes.put(instance.attribute(j).name(), value);

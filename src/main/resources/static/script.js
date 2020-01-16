@@ -383,7 +383,6 @@ const dialog = {
 						if (isTableShown)
 						{							
 							const keys = Object.keys(response.columns);
-							keys.unshift(null);
 							
 							// Container
 							const div = document.createElement("DIV");
@@ -406,7 +405,7 @@ const dialog = {
 								keys.forEach((e) => {
 									const th = document.createElement("TH");
 									th.setAttribute("data-key", e);
-									th.innerHTML = e === null ? "Target" : response.columns[e];
+									th.innerHTML = response.columns[e];
 									tr.appendChild(th);
 								});
 							}
@@ -422,7 +421,7 @@ const dialog = {
 									
 									keys.forEach((k) => {
 										const td = document.createElement("TD");
-										td.innerHTML = k === null ? e.label : e.instance[k];
+										td.innerHTML = e.instance[k];
 										tr.appendChild(td);
 									});
 								});
