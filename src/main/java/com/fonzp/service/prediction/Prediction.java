@@ -12,9 +12,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +25,6 @@ import lombok.Setter;
 @Scope("prototype")
 public class Prediction extends AbstractPrediction
 {
-	@PersistenceContext
-	private EntityManager em;
-	
 	@Setter
 	private InputStream inputStream;
 
@@ -38,12 +32,6 @@ public class Prediction extends AbstractPrediction
 	private String message;
 	private HashMap<String, String> columns;
 	private ArrayList<Feature> features;
-	
-	@Override
-	protected final EntityManager getEntityManager()
-	{
-		return em;
-	}
 	
 	@Override
 	protected final void doTaskInBackground()

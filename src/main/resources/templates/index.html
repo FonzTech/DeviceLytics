@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 		<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-light_blue.min.css">
 		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
-		<link rel="stylesheet" th:href="@{/style.css}">
+		<link rel="stylesheet" th:href="@{/css/style.css}">
 		<link rel="shortcut icon" type="image/png" th:href="@{/favicon.png}"/>
 	</head>
 	<body onload="page.load(-1)">
@@ -17,13 +17,13 @@
 				<nav class="mdl-navigation side-nav">
 					<div class="smaller">
 					</div>
-					<div class="side-menu padded">
-						<div>
+					<div class="side-menu">
+						<div class="padded">
 							You must upload a dataset first.
 						</div>
-						<div style="text-align: center">
+						<div class="session-div" style="text-align: center">
 							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="margin: 16px 0; color: white" onclick="session.load()">Load Dataset</button>
-							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin: 16px 0">Start New Session</button>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="display: none; margin: 16px 0" onclick="session.start()">Start New Session</button>
 						</div>
 					</div>
 				</nav>
@@ -81,6 +81,10 @@
 		<script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 		<script src="https://unpkg.com/chart.js@2.8.0/dist/Chart.bundle.js"></script>
 		<script src="https://unpkg.com/chartjs-chart-box-and-violin-plot@2/build/Chart.BoxPlot.js"></script>
-		<script th:src="@{/script.js}"></script>
+		<script th:src="@{/js/script.js}"></script>
+		<script th:src="@{/js/dialog.js}"></script>
+		<script th:src="@{/js/page.js}"></script>
+		<script th:src="@{/js/actions.js}"></script>
+		<script th:src="@{/js/dataProvider.js}"></script>
 	</body>
 </html>

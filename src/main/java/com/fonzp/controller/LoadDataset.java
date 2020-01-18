@@ -1,7 +1,6 @@
 package com.fonzp.controller;
 
 import java.io.File;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -27,6 +26,9 @@ public class LoadDataset
 	@Autowired
 	private DataSource ds;
 	
+	@Autowired
+	private File modelFile;
+	
 	@PostMapping(value = "/api/load_dataset", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public final Object loadDataset(@RequestParam("dataset_file") MultipartFile[] files, @RequestParam("separator") String fieldSeparator)
 	{
@@ -45,6 +47,12 @@ public class LoadDataset
 			file.deleteOnExit();
 			files[0].transferTo(file);
 			
+			// Delete old model
+			if (modelFile.exists())
+			{
+				modelFile.delete();
+			}
+			
 			// Drop any previous dataset table
 			{
 				final String query = "DROP TABLE IF EXISTS dataset";
@@ -53,9 +61,9 @@ public class LoadDataset
 			
 			// Create table from CSV
 			{
-				final String query = "CREATE TABLE dataset AS SELECT * FROM CSVREAD('" + file.getAbsolutePath() + "', NULL, 'fieldSeparator='" + (fieldSeparator.length() < 1 ? "," : fieldSeparator) + "'')";
+				final String query = "CREATE TABLE dataset AS SELECT * FROM CSVREAD('" + file.getAbsolutePath() + "', NULL, 'fieldSeparator=" + (fieldSeparator.length() < 1 ? "," : fieldSeparator) + "')";
 				ds.getConnection().createStatement().execute(query);
-				file.delete();
+				// file.delete();
 			}
 			
 			// Get inserted rows

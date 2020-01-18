@@ -2,7 +2,6 @@ package com.fonzp.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +17,6 @@ public abstract class DatabaseTask extends Task
 	{
 		super();
 	}
-	
-	/**
-	 * Get entity manager in implementation.
-	 *
-	 * @return entity manager instance.
-	 */
-	protected abstract EntityManager getEntityManager();
 	
 	@Override
 	protected final void onStart()
@@ -42,17 +34,19 @@ public abstract class DatabaseTask extends Task
 	@Override
 	protected void onFinish()
 	{
+		/*
 		if (connection != null)
 		{
 			try
 			{
 				connection.close();
 			}
-			catch (SQLException e)
+			catch (final SQLException e)
 			{
 				e.printStackTrace();
 			}
 			connection = null;
 		}
+		*/
 	}
 }

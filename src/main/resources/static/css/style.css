@@ -15,21 +15,26 @@ body {
 .page-content {
 	flex: 1
 }
-.side-nav .padded {
+.padded {
 	padding-left: 16px;
 	padding-right: 16px
 }
-/*
-.side-menu > div {
-	display: flex !important;
-	flex-direction: row;
-	justify-content: flex-start;
-	align-items: center;
-	padding-left: 24px !important
+.side-nav {
+	padding-top: 0px !important
 }
-*/
-.side-menu > div > label {
-	width: auto
+.side-menu > .mdl-navigation__link {
+    display: flex !important;
+    flex-direction: row;
+	padding: 8px 16px !important
+}
+.side-menu > .mdl-navigation__link > label {
+    width: auto !important
+}
+.side-menu > .mdl-navigation__link > input {
+    background-color: inherit;
+	flex: 1;
+	width: auto;
+    border: none
 }
 .spacer {
 	text-align: justify

@@ -2,9 +2,6 @@ package com.fonzp.task;
 
 import java.io.File;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import com.fonzp.model.ColumnToPredict;
 import com.fonzp.service.DatabaseTask;
 
@@ -18,21 +15,12 @@ import weka.core.converters.ConverterUtils.DataSource;
 @RequiredArgsConstructor
 public final class ModelEnrichment extends DatabaseTask
 {
-	@PersistenceContext
-	private EntityManager em;
-	
 	private final File arffFile;
 	private final ColumnToPredict columnToPredict;
 	private final Classifier classifier;
 	
 	private boolean result;
 	private String error;
-	
-	@Override
-	protected final EntityManager getEntityManager()
-	{
-		return em;
-	}
 
 	@Override
 	protected final void doInBackground()

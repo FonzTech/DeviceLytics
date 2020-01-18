@@ -9,9 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import com.fonzp.service.DatabaseTask;
 
 import lombok.AllArgsConstructor;
@@ -20,9 +17,6 @@ public final class CSVExporter extends DatabaseTask
 {
 	private static final String PRIMARY_KEY_COLUMN_NAME = "id";
 	
-	@PersistenceContext
-	private EntityManager em;
-	
 	private final ArrayList<String> exportData;
 	private boolean result;
 	private File output;
@@ -30,12 +24,6 @@ public final class CSVExporter extends DatabaseTask
 	public CSVExporter()
 	{
 		exportData = new ArrayList<>();
-	}
-	
-	@Override
-	protected final EntityManager getEntityManager()
-	{
-		return em;
 	}
 	
 	@Override

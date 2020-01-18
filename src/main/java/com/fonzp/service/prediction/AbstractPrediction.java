@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fonzp.model.ColumnToPredict;
 import com.fonzp.service.DatabaseTask;
 
@@ -23,7 +25,8 @@ import weka.core.SerializationHelper;
 
 public abstract class AbstractPrediction extends DatabaseTask
 {
-	protected static final File MODEL_FILE = new File("devicelytics.model");
+	@Autowired
+	protected File modelFile;
 	
 	protected Classifier classifier;
 	
@@ -186,11 +189,11 @@ public abstract class AbstractPrediction extends DatabaseTask
 	 */
 	private final void doBeforeInBackground()
 	{
-		if (MODEL_FILE.exists())
+		if (modelFile.exists())
 		{
 			try
 			{
-				classifier = (Classifier) SerializationHelper.read(MODEL_FILE.getAbsolutePath());
+				classifier = (Classifier) SerializationHelper.read(modelFile.getAbsolutePath());
 				System.out.println(getClass().getSimpleName() + " - Classifier was loaded: " + classifier);
 			}
 			catch (Exception e)
@@ -214,7 +217,7 @@ public abstract class AbstractPrediction extends DatabaseTask
 		{
 			try
 			{
-				SerializationHelper.write(MODEL_FILE.getAbsolutePath(), classifier);
+				SerializationHelper.write(modelFile.getAbsolutePath(), classifier);
 				System.out.println(getClass().getSimpleName() + " - Classifier was saved: " + classifier);
 			}
 			catch (Exception e)

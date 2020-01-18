@@ -3,9 +3,6 @@ package com.fonzp.service.prediction;
 import java.io.File;
 import java.io.InputStream;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -20,20 +17,11 @@ import lombok.Setter;
 @Scope("prototype")
 public final class TrainClassifier extends AbstractPrediction
 {
-	@PersistenceContext
-	private EntityManager em;
-	
 	@Setter
 	private InputStream inputStream;
 	
 	private boolean success;
 	private String message;
-	
-	@Override
-	protected final EntityManager getEntityManager()
-	{
-		return em;
-	}
 	
 	@Override
 	public final void doTaskInBackground()
