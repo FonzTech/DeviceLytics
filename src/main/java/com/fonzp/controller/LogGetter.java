@@ -1,19 +1,20 @@
 package com.fonzp.controller;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fonzp.model.LogRequest;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * This class acts as a REST Api to provide different types of services for the
@@ -22,68 +23,69 @@ import com.fonzp.model.LogRequest;
 @RestController
 public final class LogGetter
 {
-    @PersistenceContext
-    private EntityManager em;
-
-	@SuppressWarnings("unchecked")    
+	@Autowired
+	private DataSource ds;
+	
 	@PostMapping("/api/get_logs")
-	public final Object getOpLogs(@RequestBody final LogRequest logRequest)
+	public final Object getLogs(@RequestParam final String[] variables)
 	{
-		if (logRequest.isBoxPlot())
+		final Response response = new Response(false, "Unknown error.", null);
+		
+		Connection connection = null;
+		
+		try
 		{
-			final HashMap<String, ArrayList<Object>> map = new HashMap<>();
+			final ArrayList<HashMap<String, String>> values = new ArrayList<>();
 			
-			// Get program and positions
-			List<Object[]> params;
-			{
-				final Query q = em.createNativeQuery("SELECT program, position FROM oplog GROUP BY program, position");
-				params = (List<Object[]>) q.getResultList();
-			}
+			connection = ds.getConnection();
 			
-			for (final String var : logRequest.getVars())
+			final ResultSet rs = connection.createStatement().executeQuery("SELECT " + String.join(",", variables) + " FROM dataset");
+			while (rs.next())
 			{
-				for (final Object[] param : params)
+				final HashMap<String, String> map = new HashMap<>();
+				for (int i = 0; i < variables.length; ++i)
 				{
-					final Query q = em.createNativeQuery("SELECT " + var.replaceAll("/\\s/", "") + " FROM oplog WHERE program = :program AND position = :position ORDER BY id ASC");
-					q.setParameter("program", param[0]);
-					q.setParameter("position", param[1]);
-					
-					final ArrayList<Object> list = map.get(var);
-					if (list != null)
-					{
-						list.add(q.getResultList());
-					}
-					else
-					{
-						map.put(var, new ArrayList<Object>(Arrays.asList(q.getResultList())));
-					}
+					map.put(rs.getMetaData().getColumnName(i + 1), rs.getString(i + 1));
 				}
+				values.add(map);
 			}
 			
-			return map;
+			response.setSuccess(true);
+			response.setMessage(null);
+			response.setData(values);
 		}
-		else
+		catch (final Exception e)
 		{
-			final ArrayList<HashMap<String, Object>> rows = new ArrayList<>();
-			
-			final Query q = em.createNativeQuery("SELECT id, " + String.join(",", logRequest.getVars()).replaceAll("/\\s/", "") + " FROM oplog WHERE program = :program AND position = :position ORDER BY id ASC");
-			q.setParameter("position", logRequest.getPosition());
-			q.setParameter("program", logRequest.getProgram());
-			
-			for (final Object result : q.getResultList())
-			{
-				final HashMap<String, Object> row = new HashMap<>();
-				
-				final Object[] array = (Object[]) result;
-				for (int i = 0; i < array.length; ++i)
-				{
-					row.put(i == 0 ? "id" : logRequest.getVars()[i - 1], array[i]);
-				}
-				
-				rows.add(row);
-			}
-			
-			return rows;
+			e.printStackTrace();
+
+			response.setSuccess(false);
+			response.setMessage(e.getMessage());
 		}
+		finally
+		{
+			if (connection != null)
+			{
+				try
+				{
+					connection.close();
+				}
+				catch (final SQLException e)
+				{
+					e.printStackTrace();
+				}
+				connection = null;
+			}
+		}
+		
+		return response;
+	}
+	
+	@AllArgsConstructor
+	@Data
+	protected static final class Response
+	{
+		protected Boolean success;
+		protected String message;
+		protected Object data;
 	}
 }

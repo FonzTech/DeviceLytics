@@ -4,8 +4,8 @@ const page = {
 	cards: [
 		{
 			bg: "img/bg-time.jpg",
-			title: "History",
-			description: "View data history for selected variables."
+			title: "Data Plot",
+			description: "Plot data in different ways for selected variables."
 		},
 		{
 			bg: "img/bg-time.jpg",
@@ -51,19 +51,14 @@ const page = {
 		// Get side menu
 		const parent = document.querySelector(".side-menu");
 		
-		// Remove variables from side menu
-		while (parent.firstChild !== null)
-		{
-			parent.removeChild(parent.firstChild);
-		}
-		
 		// Repopulate variables
+		const before = parent.querySelector(".session-div");
 		page.items.forEach((e) => {
 			// Create anchor
 			const div = document.createElement("DIV");
 			div.setAttribute("class", "mdl-navigation__link");
 			div.setAttribute("href", "javascript:void(0)"); // Avoid following hyperlink
-			parent.appendChild(div);
+			parent.insertBefore(div, before);
 			
 			// Selectable checkbox with label
 			{

@@ -1,7 +1,9 @@
 package com.fonzp.controller;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -27,12 +29,17 @@ public final class VarsGetter
 	@PostMapping("/api/get_vars")
 	public final Object getVars()
 	{
+		final Response response = new Response(false, "Unknown error.", null);
+		
 		ArrayList<String> variables = null;
+		Connection connection = null;
 		
 		// Get table metadata
 		try
-		{			
-			final Statement stmt = ds.getConnection().createStatement();
+		{
+			connection = ds.getConnection();
+			
+			final Statement stmt = connection.createStatement();
 			ResultSet r = stmt.executeQuery("SELECT * FROM dataset LIMIT 1");
 			r.next();
 			
@@ -51,13 +58,34 @@ public final class VarsGetter
 			r.close();
 			stmt.close();
 
-			return new Response(variables != null, variables == null ? "No variables are present in the current session dataset." : null, variables);
+			response.setSuccess(variables != null);
+			response.setMessage(variables == null ? "No variables are present in the current session dataset." : null);
 		}
 		catch (final Exception e)
 		{
 			e.printStackTrace();
-			return new Response(false, e.getMessage(), variables);
+
+			response.setSuccess(false);
+			response.setMessage(e.getMessage());
 		}
+		finally
+		{
+			if (connection != null)
+			{
+				try
+				{
+					connection.close();
+				}
+				catch (final SQLException e)
+				{
+					e.printStackTrace();
+				}
+				connection = null;
+			}
+		}
+
+		response.setVariables(variables);
+		return response;
 	}
 	
 	@AllArgsConstructor

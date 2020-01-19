@@ -1,7 +1,9 @@
 package com.fonzp.controller;
 
 import java.io.File;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.sql.DataSource;
@@ -32,10 +34,15 @@ public class LoadDataset
 	@PostMapping(value = "/api/load_dataset", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public final Object loadDataset(@RequestParam("dataset_file") MultipartFile[] files, @RequestParam("separator") String fieldSeparator)
 	{
+		final Response response = new Response(false, "Unknown error.");
+		
+		Connection connection = null;
 		int rowcount = -1;
 		
 		try
 		{
+			connection = ds.getConnection();
+			
 			// Check for supplied data validity
 			if (files.length != 1 || !files[0].getOriginalFilename().toLowerCase().endsWith(".csv"))
 			{
@@ -56,19 +63,19 @@ public class LoadDataset
 			// Drop any previous dataset table
 			{
 				final String query = "DROP TABLE IF EXISTS dataset";
-				ds.getConnection().createStatement().execute(query);
+				connection.createStatement().execute(query);
 			}
 			
 			// Create table from CSV
 			{
 				final String query = "CREATE TABLE dataset AS SELECT * FROM CSVREAD('" + file.getAbsolutePath() + "', NULL, 'fieldSeparator=" + (fieldSeparator.length() < 1 ? "," : fieldSeparator) + "')";
-				ds.getConnection().createStatement().execute(query);
-				// file.delete();
+				connection.createStatement().execute(query);
+				file.delete();
 			}
 			
 			// Get inserted rows
 			{
-				final Statement stmt = ds.getConnection().createStatement();
+				final Statement stmt = connection.createStatement();
 				ResultSet r = stmt.executeQuery("SELECT COUNT(*) AS rowcount FROM dataset");
 				r.next();
 				rowcount = r.getInt("rowcount");
@@ -76,14 +83,34 @@ public class LoadDataset
 				stmt.close();
 			}
 
-			// Return result
-			return new Response(rowcount > 0, rowcount + " rows have been inserted.");
+			// Set result
+			response.setSuccess(rowcount > 0);
+			response.setMessage(rowcount + " rows have been inserted.");
 		}
 		catch (final Exception e)
 		{
 			e.printStackTrace();
-			return new Response(false, e.getMessage());
+
+			response.setSuccess(false);
+			response.setMessage(e.getMessage());
 		}
+		finally
+		{
+			if (connection != null)
+			{
+				try
+				{
+					connection.close();
+				}
+				catch (final SQLException e)
+				{
+					e.printStackTrace();
+				}
+				connection = null;
+			}
+		}
+		
+		return response;
 	}
 	
 	@AllArgsConstructor

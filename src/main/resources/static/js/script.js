@@ -24,11 +24,20 @@ const components = {
 
 const session = {
 	xhr: null,
+	startActions: {
+		"Yes": () => {
+			dialog.hide();
+			window.location.reload();
+		},
+		"No": () => {
+			dialog.hide();
+		}
+	},
 	
 	start: () => {
-		const button = document.querySelectorAll(".session-div > button");
-		button[0].style.display = "none";
-		button[1].style.display = "initial";
+		const msg = document.getElementById("new_session").cloneNode(true);
+		msg.removeAttribute("id");
+		dialog.show("Start New Session", msg, session.startActions);
 	},
 
 	load: () => {
@@ -38,7 +47,9 @@ const session = {
 				session.getVars();
 				
 				// Enable buttons on sidebar
-				session.start();
+				const button = document.querySelectorAll(".session-div > button");
+				button[0].style.display = "none";
+				button[1].style.display = "initial";
 			},
 			failure: null
 		};
@@ -46,6 +57,9 @@ const session = {
 	},
 	
 	getVars: () => {
+		document.getElementById("menu-loader").style.display = "block";
+		document.querySelector(".side-menu .padded").style.display = "none";
+		
 		if (session.xhr !== null)
 		{
 			session.xhr.abort();
@@ -56,6 +70,8 @@ const session = {
 		session.xhr.onreadystatechange = () => {
 			if (session.xhr.readyState === XMLHttpRequest.DONE)
 			{
+				document.getElementById("menu-loader").style.display = "none";
+
 				if (session.xhr.status == 200)
 				{
 					const response = JSON.parse(session.xhr.responseText);

@@ -16,8 +16,11 @@ const actions = {
 		// Check if data is available
 		if (!dataProvider.isValid())
 		{
-			const text = document.createTextNode("You must select at least one variables on the left side!");
-			dialog.show("Alert", text, dialog.closeAction);
+			const msg = document.createElement("DIV");
+			msg.style.marginTop = "16px";
+			msg.innerHTML = "You must select at least one variables on the left side!";
+			
+			dialog.show("Alert", msg, dialog.closeAction);
 			return;
 		}
 		

@@ -28,16 +28,11 @@ const dataProvider = {
 			dataProvider.xhr.abort();
 		}
 		
-		const program = document.getElementById("programs");
-		
-		const formData = {
-			vars: dataProvider.variables,
-			boxPlot: isBoxPlot
-		};
+		const formData = new FormData();
+		formData.append("variables", dataProvider.variables);
 		
 		dataProvider.xhr = new XMLHttpRequest();
 		dataProvider.xhr.open("POST", "/api/get_logs", true);
-		dataProvider.xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 		dataProvider.xhr.onreadystatechange = () => {
 			if (dataProvider.xhr.readyState === XMLHttpRequest.DONE)
 			{
@@ -51,7 +46,7 @@ const dataProvider = {
 					const datasets = [];
 
 					// Iterate through every log
-					Object.keys(dataProvider.variables).forEach((k, i) => {
+					dataProvider.variables.forEach((k, i) => {
 						// Get correct color
 						const color = dataProvider.colors[i % dataProvider.colors.length];
 						
@@ -69,27 +64,16 @@ const dataProvider = {
 						};
 						
 						// Fill data
-						if (isBoxPlot)
-						{
-							// Push dataset
-							dataset.data = response[k];
-							
+						response.data.forEach((e, j) => {
 							// Add label
-							labels.push(i + 1);
-						}
-						else
-						{
-							response.forEach((e) => {
-								// Add label
-								if (!i)
-								{
-									labels.push(e.id);
-								}
-								
-								// Dummy data for dataset
-								dataset.data.push(parseFloat(e[k]));
-							});
-						}
+							if (!i)
+							{
+								labels.push(j);
+							}
+							
+							// Dummy data for dataset
+							dataset.data.push(parseFloat(e[k]));
+						});
 							
 						// Push dataset
 						datasets.push(dataset);
@@ -109,6 +93,6 @@ const dataProvider = {
 				dataProvider.xhr = null;
 			}
 		};
-		dataProvider.xhr.send(JSON.stringify(formData));
+		dataProvider.xhr.send(formData);
 	}
 };
