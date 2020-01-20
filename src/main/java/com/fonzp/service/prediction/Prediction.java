@@ -15,7 +15,6 @@ import java.util.HashMap;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.fonzp.model.ColumnToPredict;
 import com.fonzp.task.ArffBuilder;
 
 import lombok.Data;
@@ -39,10 +38,7 @@ public class Prediction extends AbstractPrediction
 		// Train model with supplied data
 		try
 		{
-			final File csvFile = writeDataToCsv(inputStream);
-			checkDataConsistency(csvFile);
-			
-			final ArffBuilder arff = new ArffBuilder(csvFile);
+			final ArffBuilder arff = new ArffBuilder();
 			arff.start();
 			arff.join();
 			
@@ -55,13 +51,11 @@ public class Prediction extends AbstractPrediction
 				}
 				arffFile = result.getOutput();
 			}
-			
-			final ColumnToPredict columnToPredict = getColumnToPredict(csvFile);
 
 			// Load dataset in ARFF format
 			final DataSource source = new DataSource(arffFile.getAbsolutePath());
 			final Instances dataset = source.getDataSet();
-			dataset.setClassIndex(columnToPredict.getIndex());
+			dataset.setClassIndex(2);
 			
 			// Now predict the target value
 			if (dataset.numInstances() > 0)

@@ -53,7 +53,7 @@ const session = {
 			},
 			failure: null
 		};
-		session.form = actions.fileUpload("load_form", "Load Dataset");
+		session.form = actions.showDialog("load_form", "Load Dataset");
 	},
 	
 	getVars: () => {

@@ -1,15 +1,21 @@
 <form id="train_form" action="/api/train_model" method="post">
 	<h5>Build the prediction model.</h5>
 	<div>
-		Here you can upload your CSV file, in such a way the model is trained to
-		make better predictions in the future.
+		Here you can set the target variable where to make prediction on,
+		in such a way the model can be trained and to be used in the future.
 	</div>
 	<div style="margin-top: 16px">
-		<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Select File</button>
-		<span style="margin-left: 16px">
-			<b>You chose: </b>
-			<span class="file_name">---</span>
-		</span>
+		<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 100%">
+			<input class="mdl-textfield__input" type="number" id="kfolds" name="folds" value="10" placeholder="10 By Default" pattern="^[1-9]{1}[0-9]{0,}$">
+			<label class="mdl-textfield__label" for="kfolds">Number Of Folds</label>			
+    		<span class="mdl-textfield__error">Input is not a non negative number!</span>
+		</div>
+		<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 100%">
+			<select class="mdl-textfield__input" type="text" id="train-var" name="target">
+				<option value="-1">Select a variable from this list</option>
+			</select>
+			<label class="mdl-textfield__label" for="train-var">Target Feature</label>
+		</div>
 	</div>
-	<input type="file" name="train_file" style="display: none">
+	<input type="file" name="test_file" style="display: none">
 </form>

@@ -1,12 +1,14 @@
 package com.fonzp.service.prediction;
 
 import java.io.File;
-import java.io.InputStream;
+import java.util.HashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.fonzp.model.ColumnToPredict;
 import com.fonzp.task.ArffBuilder;
 import com.fonzp.task.ModelEnrichment;
 
@@ -14,25 +16,42 @@ import lombok.Data;
 import lombok.Setter;
 
 @Service
-@Scope("prototype")
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class TrainClassifier extends AbstractPrediction
 {
+	@Autowired
+	private ApplicationContext context;
+	
 	@Setter
-	private InputStream inputStream;
+	private Integer classIndex;
+	
+	@Setter
+	private Integer folds;
 	
 	private boolean success;
 	private String message;
+	private HashMap<String, Object> evaluation;
 	
 	@Override
 	public final void doTaskInBackground()
 	{
+		// Check for parameters consistency
+		if (classIndex == null || classIndex < 0)
+		{
+			message = "Target variable is invalid.";
+			return;
+		}
+		
+		if (folds < 0)
+		{
+			message = "Number of folds must be a non negative number.";
+			return;
+		}
+		
 		// Train model with supplied data
 		try
 		{
-			final File csvFile = writeDataToCsv(inputStream);
-			checkDataConsistency(csvFile);
-			
-			final ArffBuilder arff = new ArffBuilder(csvFile);
+			final ArffBuilder arff = context.getBean(ArffBuilder.class);
 			arff.start();
 			arff.join();
 			
@@ -46,8 +65,11 @@ public final class TrainClassifier extends AbstractPrediction
 				arffFile = result.getOutput();
 			}
 			
-			final ColumnToPredict columnToPredict = getColumnToPredict(csvFile);
-			final ModelEnrichment pmt = new ModelEnrichment(arffFile, columnToPredict, classifier);
+			final ModelEnrichment pmt = context.getBean(ModelEnrichment.class);
+			pmt.setArffFile(arffFile);
+			pmt.setClassIndex(classIndex);
+			pmt.setClassifier(classifier);
+			pmt.setFolds(folds);
 			pmt.start();
 			pmt.join();
 			
@@ -56,6 +78,7 @@ public final class TrainClassifier extends AbstractPrediction
 				if (result.getResult())
 				{
 					success = true;
+					evaluation = result.getEvaluation();
 				}
 				else
 				{
@@ -65,7 +88,7 @@ public final class TrainClassifier extends AbstractPrediction
 			
 			message = "The Model was trained correctly.";
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			e.printStackTrace();
 			message = e.getMessage();
@@ -75,7 +98,7 @@ public final class TrainClassifier extends AbstractPrediction
 	@Override
 	public final Object getResult()
 	{
-		return new Result(success, message);
+		return new Result(success, message, classIndex, evaluation);
 	}
 	
 	// Getter result
@@ -84,5 +107,7 @@ public final class TrainClassifier extends AbstractPrediction
 	{
 		protected final Boolean success;
 		protected final String message;
+		protected final Integer classIndex;
+		protected final HashMap<String, Object> evaluation;
 	}
 }
