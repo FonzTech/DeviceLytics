@@ -1,17 +1,12 @@
 package com.fonzp.task;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.fonzp.service.Task;
+import com.fonzp.service.DatabaseTask;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,31 +18,20 @@ import weka.core.converters.CSVLoader;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public final class ArffBuilder extends Task
+public final class ArffBuilder extends DatabaseTask
 {
-	@Autowired
-	private DataSource ds;
-	
 	private boolean result;
 	private File output;
 	private String error;
 
 	@Override
-	protected final void onStart()
-	{
-	}
-
-	@Override
 	protected void doInBackground()
 	{
-		Connection connection = null;
-		
 		try
 		{
 			// Export loaded file to CSV file
 			final File file = File.createTempFile("csv-", ".csv");
 			{
-				connection = ds.getConnection();
 				connection.createStatement().execute("CALL CSVWRITE('" + file.getAbsolutePath() + "', 'SELECT * FROM dataset')");
 			}
 			
@@ -78,21 +62,6 @@ public final class ArffBuilder extends Task
 		{
 			e.printStackTrace();
 			error = e.getMessage();
-		}
-		finally
-		{
-			if (connection != null)
-			{
-				try
-				{
-					connection.close();
-				}
-				catch (final SQLException e)
-				{
-					e.printStackTrace();
-				}
-				connection = null;
-			}
 		}
 	}
 

@@ -23,22 +23,6 @@ const dialog = {
 						// Parse response
 						const response = JSON.parse(dialog.xhr.responseText);
 						
-						// Launch callbacks
-						if (dialog.callbacks !== null)
-						{
-							if (response.success)
-							{
-								if (dialog.callbacks.success !== null)
-								{
-									dialog.callbacks.success();
-								}
-							}
-							else if (dialog.callbacks.failure !== null)
-							{
-								dialog.callbacks.failure();
-							}
-						}
-						
 						// Show error if required
 						const message = document.getElementById("message_form").cloneNode(true);
 						const comp = [
@@ -100,12 +84,29 @@ const dialog = {
 							}
 						}
 
+						// Update dialog
 						dialog.show(null, message, dialog.closeAction);
 
 						if (isTableShown)
 						{
 							dialog.get().classList.remove("dialog-wide");
 							dialog.get().classList.add("dialog-ultrawide");
+						}
+						
+						// Launch callbacks
+						if (dialog.callbacks !== null)
+						{
+							if (response.success)
+							{
+								if (dialog.callbacks.success !== null)
+								{
+									dialog.callbacks.success(response);
+								}
+							}
+							else if (dialog.callbacks.failure !== null)
+							{
+								dialog.callbacks.failure();
+							}
 						}
 					}
 					else if (dialog.xhr.status != 0)

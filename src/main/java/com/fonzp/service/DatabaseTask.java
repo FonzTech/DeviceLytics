@@ -34,7 +34,6 @@ public abstract class DatabaseTask extends Task
 	@Override
 	protected void onFinish()
 	{
-		/*
 		if (connection != null)
 		{
 			try
@@ -47,6 +46,5 @@ public abstract class DatabaseTask extends Task
 			}
 			connection = null;
 		}
-		*/
 	}
 }

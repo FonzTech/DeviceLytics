@@ -129,6 +129,48 @@ body {
 .table-container tr {
 	text-align: center
 }
+.tabs > div:first-child {
+	display: flex;
+	flex-direction: row
+}
+.tabs > div:first-child > button {
+	border-radius: 4px 4px 0 0
+}
+.tabs > div:first-child > button.selected {
+	background-color: rgb(71, 163, 237);
+	color: white
+}
+.tabs > div:last-child {
+	border-color: rgb(71, 163, 237);
+	border-style: solid;
+	border-width: 2px;
+	box-sizing: border-box
+}
+.tabs > div:last-child > div {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap
+}
+.tabs > div:last-child > div > div {
+	width: 50%;
+	padding: 16px 0;
+	box-sizing: border-box;
+    border-style: solid;
+    border-color: #a0a0a0;
+    border-width: 0;
+    text-align: center
+}
+.tabs > div:last-child > div > div:nth-child(1),
+.tabs > div:last-child > div > div:nth-child(3) {
+    border-width: 0 1px 1px 0
+}
+.tabs > div:last-child > div > div:nth-child(2),
+.tabs > div:last-child > div > div:nth-child(4) {
+    border-width: 0 0 1px 0
+}
+.tabs > div:last-child > div > div:nth-child(5) {
+    border-width: 0 1px 0 0
+}
 
 @media screen and (max-width: 1023px) {
 	.chart-card {

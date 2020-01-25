@@ -17,6 +17,11 @@ public abstract class AbstractPrediction extends DatabaseTask
 	
 	protected Classifier classifier;
 	
+	/**
+	 * This method has to be implemented with the task to be performed after successfully
+	 * got the database connection. The method will not be executed if connection was not
+	 * available.
+	 */
 	protected abstract void doTaskInBackground();
 	
 	@Override

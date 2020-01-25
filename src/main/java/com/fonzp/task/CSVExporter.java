@@ -29,12 +29,6 @@ public final class CSVExporter extends DatabaseTask
 	@Override
 	public final void doInBackground()
 	{
-		// Check for connection
-		if (connection == null)
-		{
-			return;
-		}
-
 		// Build CSV data
 		try
 		{
@@ -94,7 +88,7 @@ public final class CSVExporter extends DatabaseTask
 			
 			result = true;
 		}
-		catch (SQLException e)
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}

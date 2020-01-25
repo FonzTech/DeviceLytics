@@ -1,12 +1,29 @@
 const actions = {
 	DIALOG_WIDE_CLASS: "dialog-wide",
+	MODEL_SCORES: {
+		"truePositives": "TP",
+		"falsePositives": "FP",
+		"trueNegatives": "TN",
+		"falseNegatives": "FN",
+		"precision": "Precision",
+		"recall": "Recall"
+	},
 	
-	check: () => {
+	check: (pred = false) => {
 		if (document.querySelector(".side-menu > .mdl-navigation__link") === null)
 		{
 			const msg = document.createElement("DIV");
 			msg.style.marginTop = "16px";
-			msg.innerHTML = "No features are currently present. You have to upload a valid dataset first.";
+			
+			if (pred)
+			{
+				msg.innerHTML  = "If you want to make predictions, you have to train the model first.";
+			}
+			else
+			{
+				msg.innerHTML = "No features are currently present. You have to upload a valid dataset first.";
+			}
+			
 			dialog.show("Alert", msg, dialog.closeAction);
 			return true;
 		}
@@ -112,9 +129,65 @@ const actions = {
 			return;
 		}
 
-		dialog.callbacks = null;
+		// Set callbacks for dialog
+		dialog.callbacks = {
+			success: (response) => {
+				console.log(response);
+				
+				// Mark model as trained
+				document.querySelector(".side-menu").setAttribute("data-trained", "");
+				
+				// Show tabs for each class values for target feature
+				const tabs = document.getElementById("model_tabs").cloneNode(true);
+				tabs.style.marginTop = "24px";
+				tabs.removeAttribute("id");
+				
+				// Add tabs and content
+				const divs = [
+					tabs.querySelector("div > div:first-child"),
+					tabs.querySelector("div > div:last-child")
+				];
+				
+				Object.keys(response.evaluation).forEach((classValue, i) =>
+				{
+					// Button tab
+					const button = document.createElement("BUTTON");
+					button.setAttribute("class", "mdl-button mdl-js-button mdl-js-ripple-effect");
+					button.setAttribute("data-target", "tab-" + i);
+					button.onclick = () => {
+						actions.setTabVisible(button);
+					};
+					button.innerHTML = classValue;
+					divs[0].appendChild(button);
+					
+					// Content tab
+					const content = document.createElement("DIV");
+					content.setAttribute("class", "tab tab-" + i);
+					divs[1].appendChild(content);
+					
+					// Scores
+					Object.keys(actions.MODEL_SCORES).forEach((key, j) =>
+					{
+						const text = document.createElement("DIV");
+						text.innerHTML = actions.MODEL_SCORES[key] + " = ";
+						text.innerHTML += j >= 4 ? (parseFloat(response.evaluation[classValue][key]) * 100.0).toFixed(2) + "%" : response.evaluation[classValue][key];
+						content.appendChild(text);
+					});
+				});
+					
+				// Trigger first tab
+				tabs.querySelector("div > div:first-child > button:first-child").onclick();
+				
+				dialog.show(null, tabs, null);
+			},
+			failure: () => {
+				// Mark model as to be trained
+				document.querySelector(".side-menu").removeAttribute("data-trained");
+			}
+		};
 		actions.showDialog("train_form", "Training");
 		
+		// Populate select list with dataset features
 		const select = document.querySelector("dialog select");
 		document.querySelectorAll(".side-menu .mdl-navigation__link").forEach((e, i) => {
 			const text = e.querySelector("input[type=text]").value;
@@ -123,7 +196,7 @@ const actions = {
 	},
 		
 	predict: () => {
-		if (actions.check())
+		if (actions.check(true))
 		{
 			return;
 		}
@@ -159,5 +232,26 @@ const actions = {
 		dialog.show(title, form, dialog.sendAndCloseAction);
 		
 		return form;
+	},
+	
+	setTabVisible: (button) => {
+		const clazz = button.getAttribute("data-target");
+		
+		// Set button visible
+		button.parentNode.parentNode.querySelectorAll("div > div:first-child > button").forEach((e) => {
+			if (e == button)
+			{
+				e.classList.add("selected");
+			}
+			else
+			{
+				e.classList.remove("selected");
+			}
+		});
+		
+		// Set tab visible
+		button.parentNode.parentNode.querySelectorAll("div > div:last-child > .tab").forEach((e) => {
+			e.style.display = e.classList.contains(clazz) ? "flex" : "none";
+		});
 	}
 };

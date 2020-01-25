@@ -42,7 +42,7 @@ const session = {
 
 	load: () => {
 		dialog.callbacks = {
-			success: () => {
+			success: (response) => {
 				// Get variables
 				session.getVars();
 				
