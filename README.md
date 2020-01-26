@@ -9,6 +9,8 @@ This project lives in an Industry 4.0 context. Through analysis of data, coming 
 
 ![Screenshot 1](readme/shot_1.png)
 
+![Screenshot 2](readme/shot_2.png)
+
 ## Technical notes
 This project is developed using web-based technologies. The software is usable through ordinary web browsers, even mobile devices. The back-end is written in Java, using Spring Boot 2 and Hibernate frameworks. Tomcat Embedded is used during development to keep this software as lightweight as possible, but it's possible to export the project as a package to be deployed on any other application container.
 
