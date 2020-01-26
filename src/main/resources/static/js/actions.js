@@ -10,7 +10,7 @@ const actions = {
 	},
 	
 	check: (pred = false) => {
-		if (document.querySelector(".side-menu > .mdl-navigation__link") === null)
+		if ((pred && !document.querySelector(".side-menu").hasAttribute("data-trained")) || document.querySelector(".side-menu > .mdl-navigation__link") === null)
 		{
 			const msg = document.createElement("DIV");
 			msg.style.marginTop = "16px";
@@ -132,10 +132,8 @@ const actions = {
 		// Set callbacks for dialog
 		dialog.callbacks = {
 			success: (response) => {
-				console.log(response);
-				
 				// Mark model as trained
-				document.querySelector(".side-menu").setAttribute("data-trained", "");
+				document.querySelector(".side-menu").setAttribute("data-trained", response.classIndex);
 				
 				// Show tabs for each class values for target feature
 				const tabs = document.getElementById("model_tabs").cloneNode(true);
@@ -203,6 +201,7 @@ const actions = {
 
 		dialog.callbacks = null;
 		actions.showDialog("predict_form", "Predictions");
+		dialog.get().querySelector("input[type=hidden]").value = document.querySelector(".side-menu").getAttribute("data-trained");
 	},
 	
 	showDialog: (id, title) => {

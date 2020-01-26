@@ -33,12 +33,19 @@ const dialog = {
 						comp[0].innerHTML = response.success ? "Congratulations" : "Error encountered";
 						comp[1].innerHTML = response.message;
 						
-						const isTableShown = "columns" in response && response.columns !== null;
+						const isTableShown = response.success && Array.isArray(response.features) && response.features.length;
 						
 						if (isTableShown)
-						{							
+						{
+							/*
 							const keys = Object.keys(response.columns);
 							keys.unshift(null);
+							*/
+							let columns = {};
+							document.querySelectorAll(".side-menu .mdl-navigation__link input[type=text]").forEach((e) => {
+								const key = e.getAttribute("placeholder");
+								columns[key] = e.value.length ? e.value : key;
+							});
 							
 							// Container
 							const div = document.createElement("DIV");
@@ -58,10 +65,10 @@ const dialog = {
 								const tr = document.createElement("TR");
 								thead.appendChild(tr);
 								
-								keys.forEach((e) => {
+								Object.keys(columns).forEach((key) => {
 									const th = document.createElement("TH");
-									th.setAttribute("data-key", e);
-									th.innerHTML = e === null ? "Label" : response.columns[e];
+									// th.innerHTML = e === null ? "Label" : response.columns[e];
+									th.innerHTML = columns[key];
 									tr.appendChild(th);
 								});
 							}
@@ -75,9 +82,10 @@ const dialog = {
 									const tr = document.createElement("TR");
 									tbody.appendChild(tr);
 									
-									keys.forEach((k) => {
+									Object.keys(columns).forEach((key) => {
 										const td = document.createElement("TD");
-										td.innerHTML = k === null ? e.label : e.instance[k];
+										// td.innerHTML = k === null ? e.label : e.instance[k];
+										td.innerHTML = e.instance[key];
 										tr.appendChild(td);
 									});
 								});

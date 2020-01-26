@@ -21,11 +21,12 @@ public final class ModelPrediction
 {
 	@Autowired
 	private ApplicationContext context;
-			
+
 	@PostMapping(value = "/api/test_model", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public final Object predictModel(@RequestParam("test_file") MultipartFile[] files) throws IOException, InterruptedException
+	public final Object predictModel(@RequestParam("test_file") MultipartFile[] files, @RequestParam("target") final String target) throws IOException, InterruptedException
 	{
 		final Prediction task = context.getBean(Prediction.class);
+		task.setClassIndex(Integer.parseInt(target));
 		task.setInputStream(files[0].getInputStream());
 		task.start();
 		task.join();

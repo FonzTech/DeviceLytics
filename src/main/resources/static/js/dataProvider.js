@@ -52,7 +52,7 @@ const dataProvider = {
 						
 						// Create dataset
 						const dataset = {
-							label: dataProvider.variables[k],
+							label: k,
 							data: [],
 							backgroundColor: "rgba(" + color + ", 0.25)",
 							borderColor: "rgba(" + color + ", 1)",

@@ -6,12 +6,12 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 import java.io.File;
 import java.io.InputStream;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +21,20 @@ import lombok.Data;
 import lombok.Setter;
 
 @Service
-@Scope("prototype")
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Prediction extends AbstractPrediction
 {
+	@Autowired
+	private ApplicationContext context;
+	
 	@Setter
 	private InputStream inputStream;
+	
+	@Setter
+	private Integer classIndex;
 
 	private boolean success;
 	private String message;
-	private HashMap<String, String> columns;
 	private ArrayList<Feature> features;
 	
 	@Override
@@ -38,7 +43,8 @@ public class Prediction extends AbstractPrediction
 		// Train model with supplied data
 		try
 		{
-			final ArffBuilder arff = new ArffBuilder();
+			final ArffBuilder arff = context.getBean(ArffBuilder.class);
+			arff.setInputStream(inputStream);
 			arff.start();
 			arff.join();
 			
@@ -55,7 +61,7 @@ public class Prediction extends AbstractPrediction
 			// Load dataset in ARFF format
 			final DataSource source = new DataSource(arffFile.getAbsolutePath());
 			final Instances dataset = source.getDataSet();
-			dataset.setClassIndex(2);
+			dataset.setClassIndex(classIndex);
 			
 			// Now predict the target value
 			if (dataset.numInstances() > 0)
@@ -91,16 +97,13 @@ public class Prediction extends AbstractPrediction
 							value = Double.toString(label);
 						}
 
-						attributes.put(instance.attribute(j).name(), value);
+						attributes.put(instance.attribute(j).name().toUpperCase(), value);
 					}
 
-					features.add(new Feature(attributes, (int) label));
+					// features.add(new Feature(attributes, (int) label));
+					features.add(new Feature(attributes));
 				}
 			}
-			
-			// Get columns
-			columns = new HashMap<>();
-			getColumns();
 			
 			// Success
 			message = "The prediction was done correctly.";
@@ -116,26 +119,7 @@ public class Prediction extends AbstractPrediction
 	@Override
 	public final Object getResult()
 	{
-		return new Result(success, message, columns, features);
-	}
-	
-	private void getColumns()
-	{		
-		try
-		{
-			final Statement stmt = connection.createStatement();
-			final ResultSet rs = stmt.executeQuery("SELECT csv_label, column_label FROM opvar");
-			
-			while (rs.next())
-			{
-				columns.put(rs.getString(1), rs.getString(2));
-			}
-			stmt.close();
-		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
+		return new Result(success, message, features);
 	}
 	
 	// Getter result
@@ -144,7 +128,6 @@ public class Prediction extends AbstractPrediction
 	{
 		protected final Boolean success;
 		protected final String message;
-		protected final HashMap<String, String> columns;
 		protected final ArrayList<Feature> features;
 	}
 
@@ -153,6 +136,6 @@ public class Prediction extends AbstractPrediction
 	protected static final class Feature
 	{
 		protected final HashMap<String, String> instance;
-		protected final double label;
+		// protected final double label;
 	}
 }
