@@ -7,6 +7,7 @@ This project was born from a real need. Then I realized that would be a nice ide
 ## About the project
 This project lives in an Industry 4.0 context. Through analysis of data, coming from multiple sources, such as industrial machinery, this software can bring a real help and support for industry production. For instance, component failure prediction during manufacturing is one of the main goal of this project. As a result, it represents an added value to companies' business.
 
+## Screenshots
 ![Screenshot 1](readme/shot_1.jpg)
 
 ![Screenshot 2](readme/shot_2.jpg)
