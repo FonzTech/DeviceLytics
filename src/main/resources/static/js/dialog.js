@@ -119,7 +119,11 @@ const dialog = {
 					}
 					else if (dialog.xhr.status != 0)
 					{
-						alert("Errore durante l'invio dei dati.");
+						const message = document.getElementById("message_form").cloneNode(true);
+						message.querySelector("h5").innerHTML = "Fatal error";
+						message.querySelector("div").innerHTML = "Response code was " + dialog.xhr.status + ".";
+						
+						dialog.show(null, message, dialog.closeAction);
 					}
 					
 					dialog.xhr = null;

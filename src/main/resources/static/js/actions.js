@@ -135,6 +135,12 @@ const actions = {
 				// Mark model as trained
 				document.querySelector(".side-menu").setAttribute("data-trained", response.classIndex);
 				
+				// Highlight training features in side menu
+				const vars = document.querySelectorAll(".side-menu .mdl-navigation__link > input[type=text]");
+				response.trainVars.forEach((e) => {
+					vars[e].classList.add("trained");
+				});
+				
 				// Show tabs for each class values for target feature
 				const tabs = document.getElementById("model_tabs").cloneNode(true);
 				tabs.style.marginTop = "24px";
@@ -186,11 +192,41 @@ const actions = {
 		actions.showDialog("train_form", "Training");
 		
 		// Populate select list with dataset features
+		const vars = document.querySelector("dialog .vars-list > .spacer");
 		const select = document.querySelector("dialog select");
+		
 		document.querySelectorAll(".side-menu .mdl-navigation__link").forEach((e, i) => {
-			const text = e.querySelector("input[type=text]").value;
+			const input = e.querySelector("input[type=text]");
+			text = input.value.replace(/\s/g, "").length ? input.value : input.getAttribute("placeholder")
 			select.options.add(new Option(text, i));
+			
+			const id = "id_" + Math.round(Math.random() * 10000);
+			
+			const label = document.createElement("LABEL");
+			label.setAttribute("class", "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect");
+			label.setAttribute("for", id);
+			vars.appendChild(label);
+			
+			const checkbox = document.createElement("INPUT");
+			checkbox.setAttribute("type", "checkbox");
+			checkbox.setAttribute("id", id);
+			checkbox.setAttribute("class", "mdl-checkbox__input");
+			checkbox.setAttribute("checked", "checked");
+			checkbox.setAttribute("name", "vars");
+			checkbox.setAttribute("value", i);
+			label.appendChild(checkbox);
+			
+			const span = document.createElement("SPAN");
+			span.setAttribute("class", "mdl-checkbox__label");
+			span.innerHTML = text;
+			label.appendChild(span);
+					
+			vars.appendChild(document.createTextNode(" "));
 		});
+		
+		vars.appendChild(document.createElement("SPAN"));
+		
+		componentHandler.upgradeDom();
 	},
 		
 	predict: () => {
@@ -201,7 +237,13 @@ const actions = {
 
 		dialog.callbacks = null;
 		actions.showDialog("predict_form", "Predictions");
-		dialog.get().querySelector("input[type=hidden]").value = document.querySelector(".side-menu").getAttribute("data-trained");
+		
+		const index = document.querySelector(".side-menu").getAttribute("data-trained");
+		dialog.get().querySelector("input[type=hidden]").value = index;
+		
+		const input = document.querySelectorAll(".side-menu .mdl-navigation__link > input[type=text]")[index];
+		text = input.value.replace(/\s/g, "").length ? input.value : input.getAttribute("placeholder");
+		dialog.get().querySelector(".target-var").innerHTML = text;
 	},
 	
 	showDialog: (id, title) => {

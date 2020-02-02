@@ -2,6 +2,10 @@ html,
 body {
 	height: 100%
 }
+.mdl-dialog {
+    top: 50%;
+    transform: translateY(-50%);
+}
 .mdl-layout__content {
 	display: inline-flex;
 	flex-direction: column
@@ -15,6 +19,18 @@ body {
 .mdl-layout-title {
 	padding-left: 0px !important;
 	text-align: center
+}
+.mdl-navigation__link > input[type=text].trained {
+	color: #f44336
+}
+.mdl-navigation__link > input[type=text].trained::placeholder {
+	color: #ff7961
+}
+.mdl-navigation__link > input[type=text].trained:-ms-input-placeholder {
+	color: #ff7961
+}
+.mdl-navigation__link > input[type=text].trained::-ms-input-placeholder {
+	color: #ff7961
 }
 .page-content {
 	flex: 1
@@ -170,6 +186,10 @@ body {
 }
 .tabs > div:last-child > div > div:nth-child(5) {
     border-width: 0 1px 0 0
+}
+.vars-list > .spacer > label {
+	display: inline-block;
+	width: 45%
 }
 
 @media screen and (max-width: 1023px) {

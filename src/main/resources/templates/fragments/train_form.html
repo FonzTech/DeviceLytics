@@ -3,8 +3,14 @@
 	<div>
 		Here you can set the target variable where to make prediction on,
 		in such a way the model can be trained and to be used in the future.
+		The target feature is always included in the dataset, even if you
+		de-select it from the below list.
 	</div>
 	<div style="margin-top: 16px">
+		<div class="vars-list">
+			<h5>Variable List</h5>
+			<div class="spacer"></div>
+		</div>
 		<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 100%">
 			<input class="mdl-textfield__input" type="number" id="kfolds" name="folds" value="10" placeholder="10 By Default" pattern="^[1-9]{1}[0-9]{0,}$">
 			<label class="mdl-textfield__label" for="kfolds">Number Of Folds</label>			

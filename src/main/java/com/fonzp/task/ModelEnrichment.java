@@ -14,10 +14,11 @@ import com.fonzp.service.DatabaseTask;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.meta.FilteredClassifier;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.Filter;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
@@ -30,7 +31,10 @@ public final class ModelEnrichment extends DatabaseTask
 	private Integer classIndex;
 	
 	@Setter
-	private Classifier classifier;
+	private Filter filter;
+	
+	@Setter
+	private FilteredClassifier classifier;
 	
 	@Setter
 	private Integer folds;
@@ -44,6 +48,9 @@ public final class ModelEnrichment extends DatabaseTask
 	{
 		try
 		{
+			// Set filters
+			classifier.setFilter(filter);
+			
 			// Load dataset
 			final DataSource source = new DataSource(arffFile.getAbsolutePath());
 			final Instances dataset = source.getDataSet();
@@ -52,6 +59,7 @@ public final class ModelEnrichment extends DatabaseTask
 			dataset.setClassIndex(classIndex);
 			
 			// Build model
+			classifier.setFilter(filter);
 			classifier.buildClassifier(dataset);
 			
 			// Cross validation

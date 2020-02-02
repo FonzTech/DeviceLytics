@@ -55,11 +55,6 @@ public final class ArffBuilder extends DatabaseTask
 				loader.setSource(file);
 			}
 
-			/*
-			final String[] options = { "-H" };
-			loader.setOptions(options);
-			*/
-
 			final Instances data = loader.getDataSet();
 
 			final ArffSaver saver = new ArffSaver();

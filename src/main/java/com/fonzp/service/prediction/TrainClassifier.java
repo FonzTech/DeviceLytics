@@ -1,6 +1,7 @@
 package com.fonzp.service.prediction;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import com.fonzp.task.ModelEnrichment;
 
 import lombok.Data;
 import lombok.Setter;
+import weka.filters.unsupervised.attribute.Remove;
 
 @Service
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
@@ -24,6 +26,9 @@ public final class TrainClassifier extends AbstractPrediction
 	
 	@Setter
 	private Integer classIndex;
+	
+	@Setter
+	private ArrayList<String> includeVarsIndexes;
 	
 	@Setter
 	private Integer folds;
@@ -65,10 +70,20 @@ public final class TrainClassifier extends AbstractPrediction
 				arffFile = result.getOutput();
 			}
 			
+			final Remove remove = new Remove();
+			remove.setInvertSelection(true);
+			remove.setAttributeIndices(String.join(",", includeVarsIndexes
+					.stream()
+					.mapToInt(s -> Integer.parseInt(s) + 1)
+					.mapToObj(n -> Integer.toString(n))
+					.toArray(String[]::new)
+			));
+			
 			final ModelEnrichment pmt = context.getBean(ModelEnrichment.class);
 			pmt.setArffFile(arffFile);
 			pmt.setClassIndex(classIndex);
 			pmt.setClassifier(classifier);
+			pmt.setFilter(remove);
 			pmt.setFolds(folds);
 			pmt.start();
 			pmt.join();
@@ -98,7 +113,7 @@ public final class TrainClassifier extends AbstractPrediction
 	@Override
 	public final Object getResult()
 	{
-		return new Result(success, message, classIndex, evaluation);
+		return new Result(success, message, classIndex, evaluation, includeVarsIndexes);
 	}
 	
 	// Getter result
@@ -109,5 +124,6 @@ public final class TrainClassifier extends AbstractPrediction
 		protected final String message;
 		protected final Integer classIndex;
 		protected final HashMap<String, Object> evaluation;
+		protected final ArrayList<String> trainVars;
 	}
 }

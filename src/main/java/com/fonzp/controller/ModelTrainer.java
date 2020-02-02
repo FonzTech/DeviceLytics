@@ -1,6 +1,8 @@
 package com.fonzp.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -21,9 +23,21 @@ public final class ModelTrainer
 	private ApplicationContext context;
 			
 	@PostMapping(value = "/api/train_model")
-	public final Object trainModel(@RequestParam("target") final String target, @RequestParam("folds") final String folds) throws IOException, InterruptedException
+	public final Object trainModel(
+			@RequestParam("target") final String target,
+			@RequestParam("folds") final String folds,
+			@RequestParam("vars") final String[] vars) throws IOException, InterruptedException
 	{
+		// Target feature is always included
+		final ArrayList<String> list = new ArrayList<>(Arrays.asList(vars));
+		if (!list.contains(target))
+		{
+			list.add(target);
+		}
+		
+		// Train classifier
 		final TrainClassifier task = context.getBean(TrainClassifier.class);
+		task.setIncludeVarsIndexes(list);
 		task.setClassIndex(Integer.parseInt(target));
 		task.setFolds(Integer.parseInt(folds));
 		task.start();
