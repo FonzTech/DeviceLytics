@@ -64,60 +64,90 @@ const actions = {
 			
 			const id = "chart_" + Math.round(Math.random() * 100000);
 		
+			const outer = document.createElement("DIV");
+			outer.setAttribute("class", "side chart-container");
+			outer.setAttribute("id", id);
+			parent.appendChild(outer);
+		
 			const container = document.createElement("DIV");
-			container.setAttribute("class", "side chart-container");
-			container.setAttribute("id", id);
 			container.style.overflowX = "auto";
 			container.style.height = "384px";
-			parent.appendChild(container);
+			outer.appendChild(container);
 			
 			const canvas = document.createElement("CANVAS");
+			canvas.setAttribute("data-type", "bar");
 			canvas.setAttribute("width", "10000");
 			canvas.setAttribute("height", "384");
 			canvas.style.height = "100%";
 			container.appendChild(canvas);
 			
-			const close = document.createElement("A");
-			close.setAttribute("class", "chart-close");
-			close.setAttribute("href", "javascript:void(0)");
-			close.onclick = () => {
-				parent.removeChild(container);
-			};
-			close.innerHTML = '<i class="material-icons" style="vertical-align: bottom">close</i> Destroy this chart';
-			container.appendChild(close);
+			const variables = dataProvider.variables.slice();
 			
-			dataProvider.get((data) => {
-				// Set width
-				if (isBoxPlot)
+			const fx = () => {
+				dataProvider.get((data) => {
+					// Set width
+					if (isBoxPlot)
+					{
+						canvas.setAttribute("width", parseInt(data.datasets.length * 256));
+					}
+					
+					// Build chart
+					new Chart(canvas, {
+						type: isBoxPlot ? "boxplot" : canvas.getAttribute("data-type"),
+						data: data,
+						options: {
+							responsive: !isBoxPlot,
+							maintainAspectRatio: false,
+							scales: {
+								yAxes: [{
+									ticks: {
+										beginAtZero: false
+									}
+								}]
+							},
+							elements: {
+								point: {
+									radius: 0
+								}
+							},
+							legend: {
+								position: "bottom"
+							}
+						}
+					});
+				}, isBoxPlot, variables);
+			};
+			
+			{
+				const right = document.createElement("DIV");
+				right.setAttribute("class", "chart-close");
+				outer.appendChild(right);
+				
+				if (!isBoxPlot)
 				{
-					canvas.setAttribute("width", parseInt(data.labels.length * 256));
+					const close = document.createElement("A");
+					close.setAttribute("href", "javascript:void(0)");
+					close.onclick = () => {
+						canvas.setAttribute("data-type", canvas.getAttribute("data-type") == "bar" ? "line" : "bar");
+						fx();
+					};
+					close.style.marginRight = "32px";
+					close.innerHTML = '<i class="material-icons" style="vertical-align: bottom">insert_chart_outlined</i> Switch between line and bar chart';
+					right.appendChild(close);
 				}
 				
-				// Build chart
-				new Chart(canvas, {
-					type: isBoxPlot ? "boxplot" : "bar",
-					data: data,
-					options: {
-						responsive: !isBoxPlot,
-						maintainAspectRatio: false,
-						scales: {
-							yAxes: [{
-								ticks: {
-									beginAtZero: true
-								}
-							}]
-						},
-						elements: {
-							point: {
-								radius: 0
-							}
-						},
-						legend: {
-							position: "bottom"
-						}
-					}
-				});
-			}, isBoxPlot);
+				{
+					const close = document.createElement("A");
+					close.setAttribute("href", "javascript:void(0)");
+					close.onclick = () => {
+						parent.removeChild(outer);
+					};
+					close.innerHTML = '<i class="material-icons" style="vertical-align: bottom">close</i> Destroy this chart';
+					right.appendChild(close);
+				}
+			}
+			
+			fx();
 			
 			componentHandler.upgradeDom();
 		}

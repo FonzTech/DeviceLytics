@@ -22,14 +22,14 @@ const dataProvider = {
 		return Object.keys(dataProvider.variables).length;
 	},
 	
-	get: (callback, isBoxPlot) => {
+	get: (callback, isBoxPlot, variables) => {
 		if (dataProvider.xhr !== null)
 		{
 			dataProvider.xhr.abort();
 		}
 		
 		const formData = new FormData();
-		formData.append("variables", dataProvider.variables);
+		formData.append("variables", variables);
 		
 		dataProvider.xhr = new XMLHttpRequest();
 		dataProvider.xhr.open("POST", "/api/get_logs", true);
@@ -68,7 +68,17 @@ const dataProvider = {
 							// Add label
 							if (!i)
 							{
-								labels.push(j);
+								if (isBoxPlot)
+								{
+									if (!labels.length)
+									{
+										labels.push("Box Plot");
+									}
+								}
+								else
+								{
+									labels.push(j);
+								}
 							}
 							
 							// Dummy data for dataset
@@ -76,6 +86,10 @@ const dataProvider = {
 						});
 							
 						// Push dataset
+						if (isBoxPlot)
+						{							
+							dataset.data = [ dataset.data ];
+						}
 						datasets.push(dataset);
 					});
 					

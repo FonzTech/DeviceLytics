@@ -87,14 +87,14 @@ public class Prediction extends AbstractPrediction
 					for (int j = 0; j < instance.numAttributes(); ++j)
 					{
 						String value;
-						
+
 						try
 						{
 							value = instance.stringValue(j);
 						}
-						catch (Exception e)
+						catch (final Exception e)
 						{
-							value = Double.toString(label);
+							value = Double.toString(instance.value(j));
 						}
 
 						attributes.put(instance.attribute(j).name().toUpperCase(), value);
