@@ -71,12 +71,21 @@ public class Prediction extends AbstractPrediction
 				for (int i = 0; i < dataset.numInstances(); ++i)
 				{
 					final Instance instance = dataset.instance(i);
+					String predictedValue = null;
 					double label = -1;
 					
 					try
 					{
+						// Get current class value
+						final double oldValue = instance.classValue();
+						
+						// Get value for predicted class value
 						label = classifier.classifyInstance(instance);
 						instance.setClassValue(label);
+						predictedValue = getStringValue(instance, classIndex);
+						
+						// Restore old value
+						instance.setClassValue(oldValue);						
 					}
 					catch (final NullPointerException ex)
 					{
@@ -86,22 +95,12 @@ public class Prediction extends AbstractPrediction
 					final HashMap<String, String> attributes = new HashMap<>();
 					for (int j = 0; j < instance.numAttributes(); ++j)
 					{
-						String value;
-
-						try
-						{
-							value = instance.stringValue(j);
-						}
-						catch (final Exception e)
-						{
-							value = Double.toString(instance.value(j));
-						}
-
+						final String value = getStringValue(instance, j);
 						attributes.put(instance.attribute(j).name().toUpperCase(), value);
 					}
 
 					// features.add(new Feature(attributes, (int) label));
-					features.add(new Feature(attributes));
+					features.add(new Feature(attributes, predictedValue));
 				}
 			}
 			
@@ -114,6 +113,30 @@ public class Prediction extends AbstractPrediction
 			e.printStackTrace();
 			message = e.getMessage();
 		}
+	}
+	
+	/**
+	 * Get human-readable string value from the instance for the provided attribute index.
+	 *
+	 * @param instance the instance to get the attribute value from.
+	 * @param attributeIndex the attribute index to be obtained and checked.
+	 *
+	 * @return human-readable string.
+	 */
+	protected final String getStringValue(final Instance instance, final int attributeIndex)
+	{
+		String value;
+
+		try
+		{
+			value = instance.stringValue(attributeIndex);
+		}
+		catch (final Exception e)
+		{
+			value = Double.toString(instance.value(attributeIndex));
+		}
+		
+		return value;
 	}
 
 	@Override
@@ -136,6 +159,6 @@ public class Prediction extends AbstractPrediction
 	protected static final class Feature
 	{
 		protected final HashMap<String, String> instance;
-		// protected final double label;
+		protected final String label;
 	}
 }

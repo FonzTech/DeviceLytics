@@ -37,58 +37,88 @@ const dialog = {
 						
 						if (isTableShown)
 						{
-							/*
-							const keys = Object.keys(response.columns);
-							keys.unshift(null);
-							*/
+							// Get actual column names
 							let columns = {};
 							document.querySelectorAll(".side-menu .mdl-navigation__link input[type=text]").forEach((e) => {
 								const key = e.getAttribute("placeholder");
 								columns[key] = e.value.length ? e.value : key;
 							});
+							const columnKeys = Object.keys(columns);
 							
 							// Container
 							const div = document.createElement("DIV");
-							div.setAttribute("class", "table-container");
+							div.setAttribute("class", "mdl-shadow--2dp predicted");
 							message.appendChild(div);
 							
 							// Table
-							const table = document.createElement("TABLE");
-							table.setAttribute("class", "mdl-data-table mdl-js-data-table mdl-shadow--2dp");
-							div.appendChild(table);
-
-							// Head of table
+							for (let i = 0; i < 2; ++i)
 							{
-								const thead = document.createElement("THEAD");
-								table.appendChild(thead);
-
-								const tr = document.createElement("TR");
-								thead.appendChild(tr);
+								const table = document.createElement("TABLE");
+								table.setAttribute("class", "mdl-data-table mdl-js-data-table");
 								
-								Object.keys(columns).forEach((key) => {
-									const th = document.createElement("TH");
-									// th.innerHTML = e === null ? "Label" : response.columns[e];
-									th.innerHTML = columns[key];
-									tr.appendChild(th);
-								});
-							}
-
-							// Body of table
-							{
-								const tbody = document.createElement("TBODY");
-								table.appendChild(tbody);
-								
-								response.features.forEach((e) => {
+								// Wrap table if necessary
+								if (i == 1)
+								{
+									// Container
+									const innerDiv = document.createElement("DIV");
+									innerDiv.setAttribute("class", "table-container");
+									innerDiv.appendChild(table);
+									div.appendChild(innerDiv);
+								}
+								else
+								{
+									div.appendChild(table);
+								}
+	
+								// Head of table
+								{
+									const thead = document.createElement("THEAD");
+									table.appendChild(thead);
+	
 									const tr = document.createElement("TR");
-									tbody.appendChild(tr);
+									thead.appendChild(tr);
 									
-									Object.keys(columns).forEach((key) => {
-										const td = document.createElement("TD");
-										// td.innerHTML = k === null ? e.label : e.instance[k];
-										td.innerHTML = e.instance[key];
-										tr.appendChild(td);
+									if (i == 0)
+									{
+										const th = document.createElement("TH");
+										th.innerHTML = "Predicted";
+										tr.appendChild(th);
+									}
+									else
+									{
+										columnKeys.forEach((key) => {
+											const th = document.createElement("TH");
+											th.innerHTML = columns[key];
+											tr.appendChild(th);
+										});
+									}
+								}
+	
+								// Body of table
+								{
+									const tbody = document.createElement("TBODY");
+									table.appendChild(tbody);
+									
+									response.features.forEach((e) => {
+										const tr = document.createElement("TR");
+										tbody.appendChild(tr);
+										
+										if (i == 0)
+										{
+											const td = document.createElement("TD");
+											td.innerHTML = e.label;
+											tr.appendChild(td);
+										}
+										else
+										{
+											columnKeys.forEach((key) => {
+												const td = document.createElement("TD");
+												td.innerHTML = e.instance[key];
+												tr.appendChild(td);
+											});
+										}
 									});
-								});
+								}
 							}
 						}
 

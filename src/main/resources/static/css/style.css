@@ -32,6 +32,9 @@ body {
 .mdl-navigation__link > input[type=text].trained::-ms-input-placeholder {
 	color: #ff7961
 }
+.mdl-data-table th {
+	text-align: center
+}
 .page-content {
 	flex: 1
 }
@@ -138,7 +141,7 @@ body {
 	overflow: auto;
 	box-shadow: 0 0 16px rgba(0, 0, 0, 0.25)
 }
-.table-container table {
+.table-container table:not(.not-100) {
 	min-width: 100%
 }
 .table-container td,
@@ -191,8 +194,35 @@ body {
 	display: inline-block;
 	width: 45%
 }
+.predicted {
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: row;
+    margin-top: 16px;
+    max-height: 320px;
+    overflow-x: hidden;
+    overflow-y: auto
+}
+.predicted > table:first-child th,
+.predicted > table:first-child td {
+	font-weight: bold;
+	text-align: center
+}
+.predicted > .table-container {
+	margin-top: 0;
+	height: 100%;
+	max-height: max-content;
+	overflow-x: auto;
+	overflow-y: hidden
+}
 
 @media screen and (max-width: 1023px) {
+	.vars-list > .spacer > label {
+	    width: 100%
+	}
+	.dialog-ultrawide {
+		max-width: calc(100% - 16px)
+	}
 	.chart-card {
 		width: 100%
 	}	
