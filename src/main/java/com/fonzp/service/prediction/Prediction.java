@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -36,6 +37,7 @@ public class Prediction extends AbstractPrediction
 	private boolean success;
 	private String message;
 	private ArrayList<Feature> features;
+	private long[] score;
 	
 	@Override
 	protected final void doTaskInBackground()
@@ -64,6 +66,8 @@ public class Prediction extends AbstractPrediction
 			dataset.setClassIndex(classIndex);
 			
 			// Now predict the target value
+			score = new long[] { 0L, 0L };
+			
 			if (dataset.numInstances() > 0)
 			{
 				features = new ArrayList<>();
@@ -97,6 +101,11 @@ public class Prediction extends AbstractPrediction
 					{
 						final String value = getStringValue(instance, j);
 						attributes.put(instance.attribute(j).name().toUpperCase(), value);
+						
+						if (j == classIndex)
+						{
+							++score[value == predictedValue ? 0 : 1];
+						}
 					}
 
 					// features.add(new Feature(attributes, (int) label));
@@ -105,7 +114,8 @@ public class Prediction extends AbstractPrediction
 			}
 			
 			// Success
-			message = "The prediction was done correctly.";
+			final String rate = String.format(Locale.ENGLISH, "%.3f", getMisclassificationRate() * 100.0);
+			message = "The prediction was done correctly, with a misclassification rate of " + rate + "%.";
 			success = true;
 		}
 		catch (final Exception e)
@@ -113,6 +123,13 @@ public class Prediction extends AbstractPrediction
 			e.printStackTrace();
 			message = e.getMessage();
 		}
+	}
+
+	@Override
+	public final Object getResult()
+	{
+		final double misclassification = getMisclassificationRate();
+		return new Result(success, message, features, misclassification);
 	}
 	
 	/**
@@ -138,11 +155,17 @@ public class Prediction extends AbstractPrediction
 		
 		return value;
 	}
-
-	@Override
-	public final Object getResult()
+	
+	/**
+	 * Get misclassification rate, which is the number of misclassified instances divided by
+	 * the total number of classified instances. The result is a coefficient which ranges from
+	 * 0 to 1.
+	 *
+	 * @return floating-point value from 0 to 1.
+	 */
+	protected final double getMisclassificationRate()
 	{
-		return new Result(success, message, features);
+		return score != null && score[1] != 0L ? (double) score[1] / (double) (score[0] + score[1]) : 0.0;
 	}
 	
 	// Getter result
@@ -152,6 +175,7 @@ public class Prediction extends AbstractPrediction
 		protected final Boolean success;
 		protected final String message;
 		protected final ArrayList<Feature> features;
+		protected final double misclassification;
 	}
 
 	// Feature class

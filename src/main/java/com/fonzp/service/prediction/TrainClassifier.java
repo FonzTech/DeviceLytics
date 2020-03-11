@@ -60,6 +60,8 @@ public final class TrainClassifier extends AbstractPrediction
 			arff.start();
 			arff.join();
 			
+			System.out.println("Traning model");
+			
 			final File arffFile;
 			{
 				final ArffBuilder.Result result = (ArffBuilder.Result) arff.getResult();
