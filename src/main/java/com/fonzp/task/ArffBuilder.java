@@ -51,6 +51,8 @@ public final class ArffBuilder extends DatabaseTask
 				// Export loaded file to CSV file
 				final File file = File.createTempFile("csv-", ".csv");
 				connection.createStatement().execute("CALL CSVWRITE('" + file.getAbsolutePath() + "', 'SELECT * FROM dataset')");
+				
+				System.out.println("CSV Written from database");
 
 				loader.setSource(file);
 			}
