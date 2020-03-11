@@ -42,12 +42,16 @@ public final class ModelEnrichment extends DatabaseTask
 	private boolean result;
 	private String error;
 	private HashMap<String, Object> measures;
+	private long elapsedTime;
 
 	@Override
 	protected final void doInBackground()
 	{
 		try
 		{
+			// Set start time
+			final long start = System.currentTimeMillis();
+			
 			// Set filters
 			classifier.setFilter(filter);
 			
@@ -89,6 +93,8 @@ public final class ModelEnrichment extends DatabaseTask
 				measures.put(key, values);
 			}
 			
+			elapsedTime = System.currentTimeMillis() - start;
+			
 			result = true;
 		}
 		catch (final Exception e)
@@ -101,7 +107,7 @@ public final class ModelEnrichment extends DatabaseTask
 	@Override
 	public final Object getResult()
 	{
-		return new Result(result, error, measures);
+		return new Result(result, error, measures, elapsedTime);
 	}
 	
 	@RequiredArgsConstructor
@@ -111,5 +117,6 @@ public final class ModelEnrichment extends DatabaseTask
 		protected final Boolean result;
 		protected final String error;
 		protected final HashMap<String, Object> evaluation;
+		protected final long elapsedTime;
 	}
 }

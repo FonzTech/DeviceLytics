@@ -178,9 +178,13 @@ const actions = {
 				
 				// Add tabs and content
 				const divs = [
-					tabs.querySelector("div > div:first-child"),
-					tabs.querySelector("div > div:last-child")
+					tabs.querySelector("div > div:nth-child(1)"),
+					tabs.querySelector("div > div:nth-child(2)"),
+					tabs.querySelector("div > div:nth-child(3)")
 				];
+				
+				// Display message
+				divs[0].innerHTML = response.message;
 				
 				Object.keys(response.evaluation).forEach((classValue, i) =>
 				{
@@ -192,12 +196,12 @@ const actions = {
 						actions.setTabVisible(button);
 					};
 					button.innerHTML = classValue;
-					divs[0].appendChild(button);
+					divs[1].appendChild(button);
 					
 					// Content tab
 					const content = document.createElement("DIV");
 					content.setAttribute("class", "tab tab-" + i);
-					divs[1].appendChild(content);
+					divs[2].appendChild(content);
 					
 					// Scores
 					Object.keys(actions.MODEL_SCORES).forEach((key, j) =>
@@ -210,7 +214,7 @@ const actions = {
 				});
 					
 				// Trigger first tab
-				tabs.querySelector("div > div:first-child > button:first-child").onclick();
+				tabs.querySelector('button[data-target="tab-0"]').click();
 				
 				dialog.show(null, tabs, null);
 			},
@@ -225,6 +229,18 @@ const actions = {
 		const vars = document.querySelector("dialog .vars-list > .spacer");
 		const select = document.querySelector("dialog select");
 		
+		// Clear containers
+		while (vars.firstChild !== null)
+		{
+			vars.removeChild(vars.firstChild);
+		}
+		
+		while (select.options.length > 1)
+		{
+			select.remove(1);
+		}
+		
+		// Append variables
 		document.querySelectorAll(".side-menu .mdl-navigation__link").forEach((e, i) => {
 			const input = e.querySelector("input[type=text]");
 			text = input.value.replace(/\s/g, "").length ? input.value : input.getAttribute("placeholder")
@@ -309,7 +325,7 @@ const actions = {
 		const clazz = button.getAttribute("data-target");
 		
 		// Set button visible
-		button.parentNode.parentNode.querySelectorAll("div > div:first-child > button").forEach((e) => {
+		button.parentNode.parentNode.querySelectorAll("div > div:nth-child(2) > button").forEach((e) => {
 			if (e == button)
 			{
 				e.classList.add("selected");
@@ -321,7 +337,7 @@ const actions = {
 		});
 		
 		// Set tab visible
-		button.parentNode.parentNode.querySelectorAll("div > div:last-child > .tab").forEach((e) => {
+		button.parentNode.parentNode.querySelectorAll("div > div:nth-child(3) > .tab").forEach((e) => {
 			e.style.display = e.classList.contains(clazz) ? "flex" : "none";
 		});
 	}

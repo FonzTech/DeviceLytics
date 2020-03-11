@@ -1,8 +1,10 @@
 package com.fonzp.service.prediction;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -90,12 +92,35 @@ public final class TrainClassifier extends AbstractPrediction
 			pmt.start();
 			pmt.join();
 			
+			final StringBuilder elapsedTime = new StringBuilder();
 			{
 				final ModelEnrichment.Result result = (ModelEnrichment.Result) pmt.getResult();
 				if (result.getResult())
 				{
 					success = true;
 					evaluation = result.getEvaluation();
+					
+					// Parse duration
+					final long time = result.getElapsedTime();
+					final Duration duration = Duration.ofMillis(time);
+
+					// Prepend hours
+					if (duration.toHours() > 0)
+					{
+						elapsedTime.append(duration.toHours()).append("h ");
+					}
+
+					// Append minutes
+					if (duration.toMinutes() > 0)
+					{
+						elapsedTime.append(duration.toMinutes() % 60).append("m ");
+					}
+
+					// Append seconds
+					elapsedTime.append(duration.getSeconds() > 0 ? duration.getSeconds() % 60 : 0).append(".");
+					
+					// Append milliseconds
+					elapsedTime.append(String.format(Locale.ENGLISH, "%03d", duration.toMillis() % 1000)).append("s");
 				}
 				else
 				{
@@ -103,7 +128,7 @@ public final class TrainClassifier extends AbstractPrediction
 				}
 			}
 			
-			message = "The Model was trained correctly.";
+			message = "The Model was trained correctly. Elapsed time: " + elapsedTime + ".";
 		}
 		catch (final Exception e)
 		{
