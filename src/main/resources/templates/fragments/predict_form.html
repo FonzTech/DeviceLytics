@@ -1,10 +1,11 @@
 <form id="predict_form" action="/api/test_model" method="post">
 	<h5>Upload set file to make prediction on.</h5>
 	<div>
-		Here you can upload your CSV file. If it contains no target (dependent) variable,
+		Here you can upload your CSV file. Predictions are performed on the very last
+		model you have trained. If it contains no target (dependent) variable,
 		the prediction model gives you the desired prediction. If the target variable is
 		present and valued, this functionality is used to test the model, providing you
-		the confusion matrix.
+		the misclassification rate.
 	</div>
 	<h5 style="margin: 16px 0 24px 0; font-weight: normal">
 		<b>You are making predictions on: </b><span class="target-var">---</span>

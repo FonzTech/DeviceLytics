@@ -38,12 +38,23 @@ const dialog = {
 						if (isTableShown)
 						{
 							// Get actual column names
-							let columns = {};
-							document.querySelectorAll(".side-menu .mdl-navigation__link input[type=text]").forEach((e) => {
-								const key = e.getAttribute("placeholder");
-								columns[key] = e.value.length ? e.value : key;
-							});
-							const columnKeys = Object.keys(columns);
+							let columns = {}, columnKeys = {};
+							{
+								document.querySelectorAll(".side-menu .mdl-navigation__link input[type=text]").forEach((e) => {
+									const key = e.getAttribute("placeholder");
+									columns[key] = e.value.length ? e.value : key;
+								});
+								columnKeys = Object.keys(columns);
+								
+								if (!columnKeys.length)
+								{
+									columnKeys = Object.keys(response.features[0].instance);
+									columnKeys.forEach((k) => {
+										columns[k] = k;
+									});
+								}
+							}
+							
 							
 							// Container
 							const div = document.createElement("DIV");

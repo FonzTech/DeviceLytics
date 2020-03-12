@@ -17,7 +17,7 @@
 				<nav class="mdl-navigation side-nav">
 					<div class="smaller">
 					</div>
-					<div class="side-menu">
+					<div class="side-menu" th:attrappend="data-trained=${classIndex != null}?${classIndex}">
 						<div class="padded">
 							You must upload a dataset first.
 						</div>
@@ -86,6 +86,7 @@
 				<div></div>
 			</div>
 		</div>
+		<input th:if="${target != null}" id="last-target" type="hidden" th:value="${target != null}?${target}">
 		<script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 		<script src="https://unpkg.com/chart.js@2.8.0/dist/Chart.bundle.js"></script>
 		<script src="https://unpkg.com/chartjs-chart-box-and-violin-plot@2/build/Chart.BoxPlot.js"></script>

@@ -10,7 +10,9 @@ const actions = {
 	},
 	
 	check: (pred = false) => {
-		if ((pred && !document.querySelector(".side-menu").hasAttribute("data-trained")) || document.querySelector(".side-menu > .mdl-navigation__link") === null)
+		const b1 = !pred && document.querySelector(".side-menu > .mdl-navigation__link") === null;
+		const b2 = pred && !document.querySelector(".side-menu").hasAttribute("data-trained");
+		if (b1 || b2)
 		{
 			const msg = document.createElement("DIV");
 			msg.style.marginTop = "16px";
@@ -164,6 +166,14 @@ const actions = {
 			success: (response) => {
 				// Mark model as trained
 				document.querySelector(".side-menu").setAttribute("data-trained", response.classIndex);
+
+				{
+					const target = document.getElementById("last-target");
+					if (target !== null)
+					{
+						target.parentNode.removeChild(target);
+					}
+				}
 				
 				// Highlight training features in side menu
 				const vars = document.querySelectorAll(".side-menu .mdl-navigation__link > input[type=text]");
@@ -228,6 +238,9 @@ const actions = {
 		// Populate select list with dataset features
 		const vars = document.querySelector("dialog .vars-list > .spacer");
 		const select = document.querySelector("dialog select");
+		select.onchange = () => {
+			document.querySelector("dialog input[type=hidden]").value = select.options[select.selectedIndex].text;
+		};
 		
 		// Clear containers
 		while (vars.firstChild !== null)
@@ -243,7 +256,7 @@ const actions = {
 		// Append variables
 		document.querySelectorAll(".side-menu .mdl-navigation__link").forEach((e, i) => {
 			const input = e.querySelector("input[type=text]");
-			text = input.value.replace(/\s/g, "").length ? input.value : input.getAttribute("placeholder")
+			text = input.value.replace(/\s/g, "").length ? input.value : input.getAttribute("placeholder");
 			select.options.add(new Option(text, i));
 			
 			const id = "id_" + Math.round(Math.random() * 10000);
@@ -287,9 +300,18 @@ const actions = {
 		const index = document.querySelector(".side-menu").getAttribute("data-trained");
 		dialog.get().querySelector("input[type=hidden]").value = index;
 		
-		const input = document.querySelectorAll(".side-menu .mdl-navigation__link > input[type=text]")[index];
-		text = input.value.replace(/\s/g, "").length ? input.value : input.getAttribute("placeholder");
-		dialog.get().querySelector(".target-var").innerHTML = text;
+		const targetVar = dialog.get().querySelector(".target-var");
+		const target = document.getElementById("last-target");
+		if (target !== null)
+		{
+			targetVar.innerHTML = target.value;
+		}
+		else
+		{
+			const input = document.querySelectorAll(".side-menu .mdl-navigation__link > input[type=text]")[index];
+			text = input.value.replace(/\s/g, "").length ? input.value : input.getAttribute("placeholder");
+			targetVar.innerHTML = text;
+		}
 	},
 	
 	showDialog: (id, title) => {

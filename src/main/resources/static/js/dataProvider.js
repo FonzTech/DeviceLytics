@@ -8,7 +8,7 @@ const dataProvider = {
         "153, 102, 255",
         "255, 159, 64"
 	],
-	variables: {},
+	variables: [],
 	
 	build: () => {
 		dataProvider.variables = [];		
