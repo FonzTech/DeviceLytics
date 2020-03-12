@@ -11,6 +11,11 @@ public class AppConfig
 	@Bean
 	public File getModelFile()
 	{
-		return new File("devicelytics.model");
+		final File file = new File("models/devicelytics.model");
+		if (!file.exists())
+		{
+			file.getParentFile().mkdirs();
+		}
+		return file;
 	}
 }
